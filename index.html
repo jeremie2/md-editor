@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Editor Markdown</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script src="marked.umd.js"></script>
+  <script src="buttons_editor.js" defer></script>
+</head>
+<body>
+
+<h1>Markdown Editor</h1>
+
+<div class=push>
+  <button type="button" id="btn-bold" title="Grassetto"><b>B</b></button>
+  <button type="button" id="btn-italic" title="Corsivo"><b><i>i</i></b></button>
+  <button type="button" id="btn-tt" title="Largezza fissa"><tt>tt</tt></button>
+  <button type="button" id="btn-codeblock" title="Blocco codice"><b><</b><b>></b></button>
+  <button type="button" id="btn-quote" title="Quote"><b>"</b> <b>"</b></button>
+  <button type="button" id="btn-br" title="A capo"><b>br</b></button>
+  <button type="button" id="btn-comment" title="Commento"><--</button>
+  <button type="button" id="btn-bullet" title="Elenco puntato">:=</button>
+  <button type="button" id="btn-num" title="Elenco numerato">:1</button>
+  <button type="button" id="btn-table" title="Tabella">🪟</button>
+  <button type="button" id="btn-link" title="Link">🔗</button>
+  <button type="button" id="btn-img" title="Immagine">🖼️</button>
+  <button type="button" id="btn-h1" title="Paragrafo">Par 1</button>
+  <button type="button" id="btn-h2" title="Sotto paragrafo">Par 2</button>
+  <button type="button" id="btn-h3" title="Sotto sotto paragrafo">Par 3</button>
+  <button type="button" id="btn-note" title="Nota">📝</button>
+  <button type="button" id="btn-tip" title="Suggerimento">💡</button>
+  <button type="button" id="btn-warning" title="Avviso">⚠️</button>
+</div>
+
+<div class="editor-container">
+  <textarea id="markdown-input" placeholder="Scrivi qui in Markdown..."></textarea>
+  <div id="preview"></div>
+</div>
+
+</body>
+</html>
