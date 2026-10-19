@@ -71,7 +71,9 @@ function execInsert(newText, start, end) {
 }
 ```
 
-- **newText**: new text that we want to modify as `**text**`, `- raw`, etc. Let's take the string `ciao` as example and pretend it is first string inside the input area.  
+- **newText**: new text that we want to modify as `**text**`, `- raw`, etc. Let's take the string `ciao` as example and pretend it is first string inside the input area.
+
+# WORK IN PROGRESS...
 
 - **start**: numerical index position of the first character, from which we'll apply the change. In our example the character `c` will be in **position 0**.
 
