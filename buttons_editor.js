@@ -58,7 +58,6 @@ function insertMarkdown(startSymbol, endSymbol = startSymbol, placeholder = "") 
     updatePreview();
 }
 
-
 // :::::::::::::::::::::: SINGLE SYMBOLS (heading, quote...)
 
 function toggleLineSymbol(symbol) {
@@ -165,11 +164,36 @@ document.getElementById('btn-h2').addEventListener('click', () => toggleLineSymb
 document.getElementById('btn-h3').addEventListener('click', () => toggleLineSymbol('### '));
 
 document.getElementById('btn-link').addEventListener('click', () => {
-  insertBlock('[Testo](https://example.com)', 19, 8);
+    markdownInput.focus();
+    const start = markdownInput.selectionStart;
+    const end = markdownInput.selectionEnd;
+    const selected = markdownInput.value.substring(start, end);
+    
+    const label = selected || 'Testo';
+    const template = `[${label}](https://example.com)`;
+    
+    execInsert(template, start, end);
+    
+    // The URL example will be immediately selected to 
+    // change it quickly.
+    const offsetStart = start + label.length + 3;
+    markdownInput.setSelectionRange(offsetStart, offsetStart + 19);
+    updatePreview();
 });
 
 document.getElementById('btn-img').addEventListener('click', () => {
-  insertBlock('\n<div align="center">\n\    <img src="img.png" width="400">\n</div>\n', 29, 14);
+    markdownInput.focus();
+    const start = markdownInput.selectionStart;
+    const end = markdownInput.selectionEnd;
+    
+    const template = '\n<div align="center">\n  <img src="img.png" width="400">\n</div>\n';
+    execInsert(template, start, end);
+    
+    // The `img.png` example will be immediately selected to
+    // change it quickly. 
+    const offsetStart = start + 34;
+    markdownInput.setSelectionRange(offsetStart, offsetStart + 7);
+    updatePreview();
 });
 
 document.getElementById('btn-table').addEventListener('click', () => {
