@@ -195,23 +195,21 @@ document.getElementById('btn-img').addEventListener('click', () => {
     markdownInput.setSelectionRange(offsetStart, offsetStart + 7);
     updatePreview();
 });
-
 document.getElementById('btn-table').addEventListener('click', () => {
   const tableTemplate = '\n| Header 1 | Header 2 | Header 3 |\n| :---     | :---:    | ---:     |\n| Cella    | Cella    | Cella    |\n';
   insertBlock(tableTemplate, 0, tableTemplate.length);
 });
-
 document.getElementById('btn-note').addEventListener('click', () => {
-  const tableTemplate = '\n> 📝 **Nota**<br>\nScrivi qui la tua nota.\n';
-  insertBlock(tableTemplate, 0, tableTemplate.length);
+    const template = '\n> 📝 **Nota**<br>\nScrivi qui la tua nota.\n';
+    insertBlock(template, 23, 19);
 });
 document.getElementById('btn-tip').addEventListener('click', () => {
-  const tableTemplate = '\n> 💡 **Suggerimento**<br>\nScrivi qui il tuo suggerimento.\n';
-  insertBlock(tableTemplate, 0, tableTemplate.length);
+    const template = '\n> 💡 **Suggerimento**<br>\nScrivi qui il tuo suggerimento.\n';
+    insertBlock(template, 31, 27);
 });
 document.getElementById('btn-warning').addEventListener('click', () => {
-  const tableTemplate = '\n> ⚠️ **Avviso!**<br>\nScrivi qui il tuo avviso.\n';
-  insertBlock(tableTemplate, 0, tableTemplate.length);
+    const template = '\n> ⚠️ **Avviso!**<br>\nScrivi qui il tuo avviso.\n';
+    insertBlock(template, 25, 21);
 });
 
 // ::::::::::: KEYBOARD SHORTCUTS
