@@ -28,32 +28,36 @@ function execInsert(newText, start, end) {
 // :::::::::::::::::::::: AROUND SYMBOLS (bold, italic, tt...)
 
 function insertMarkdown(startSymbol, endSymbol = startSymbol, placeholder = "") {
-  markdownInput.focus();
+    markdownInput.focus();
+    const start = markdownInput.selectionStart;
+    const end = markdownInput.selectionEnd;
+    const text = markdownInput.value;
+    const selected = text.substring(start, end);
 
-  const start = markdownInput.selectionStart;
-  const end = markdownInput.selectionEnd;
-  const text = markdownInput.value;
-  const selected = text.substring(start, end);
+    let newText = "";
+    let selectionOffsetStart = 0;
+    let selectionOffsetEnd = 0;
 
-  let newText = "";
-  let selectionOffsetStart = 0;
-  let selectionOffsetEnd = 0;
+    // Toggle OFF
+    if (selected.startsWith(startSymbol) && selected.endsWith(endSymbol)) {
+        newText = selected.substring(startSymbol.length, selected.length - endSymbol.length);
+        selectionOffsetStart = start;
+        selectionOffsetEnd = start + newText.length;
+    } 
+    // Toggle ON
+    else {
+        const defaultText = selected || placeholder;
+        newText = startSymbol + defaultText + endSymbol;
+        
+        selectionOffsetStart = start;
+        selectionOffsetEnd = start + newText.length;
+    }
 
-  if (selected.startsWith(startSymbol) && selected.endsWith(endSymbol)) {
-    newText = selected.substring(startSymbol.length, selected.length - endSymbol.length);
-    selectionOffsetStart = start;
-    selectionOffsetEnd = start + newText.length;
-  } else {
-    const defaultText = selected || placeholder;
-    newText = startSymbol + defaultText + endSymbol;
-    selectionOffsetStart = start + startSymbol.length;
-    selectionOffsetEnd = start + startSymbol.length + defaultText.length;
-  }
-
-  execInsert(newText, start, end);
-  markdownInput.setSelectionRange(selectionOffsetStart, selectionOffsetEnd);
-  updatePreview();
+    execInsert(newText, start, end);
+    markdownInput.setSelectionRange(selectionOffsetStart, selectionOffsetEnd);
+    updatePreview();
 }
+
 
 // :::::::::::::::::::::: SINGLE SYMBOLS (heading, quote...)
 
@@ -145,9 +149,9 @@ function insertBlock(template, placeholderLength = 0, offsetFromStart = 0) {
 
 // :::::::::::::::::::::: EVENT LISTENERS
 
-document.getElementById('btn-bold').addEventListener('click', () => insertMarkdown('**', '**', 'testo'));
-document.getElementById('btn-italic').addEventListener('click', () => insertMarkdown('*', '*', 'testo'));
-document.getElementById('btn-tt').addEventListener('click', () => insertMarkdown('`', '`', 'codice'));
+document.getElementById('btn-bold').addEventListener('click', () => insertMarkdown('**', '**', ''));
+document.getElementById('btn-italic').addEventListener('click', () => insertMarkdown('*', '*', ''));
+document.getElementById('btn-tt').addEventListener('click', () => insertMarkdown('`', '`', ''));
 document.getElementById('btn-codeblock').addEventListener('click', toggleCodeBlock);
 document.getElementById('btn-quote').addEventListener('click', () => toggleLineSymbol('> '));
 document.getElementById('btn-br').addEventListener('click', () => insertMarkdown('', '<br>', ''));
@@ -184,4 +188,32 @@ document.getElementById('btn-tip').addEventListener('click', () => {
 document.getElementById('btn-warning').addEventListener('click', () => {
   const tableTemplate = '\n> ⚠️ **Avviso!**<br>\nScrivi qui il tuo avviso.\n';
   insertBlock(tableTemplate, 0, tableTemplate.length);
+});
+
+// ::::::::::: KEYBOARD SHORTCUTS
+// Could break browser's shortcut with focus on input area.
+
+markdownInput.addEventListener('keydown', (e) => {
+    // Check key Ctrl (Cmd on Mac) is pressed.
+    const isModifier = e.ctrlKey || e.metaKey;
+
+    if (isModifier) {
+        switch (e.key.toLowerCase()) {
+            // Bold
+            case 'b':  
+                e.preventDefault(); // Stop browser behaviour
+                insertMarkdown('**', '**', '');
+                break;
+            // Italic   
+            case 'i':
+                e.preventDefault();
+                insertMarkdown('*', '*', '');
+                break;
+            // Fixed-width text  
+            case '`': 
+                e.preventDefault();
+                insertMarkdown('`', '`', '');
+                break;
+        }
+    }
 });
