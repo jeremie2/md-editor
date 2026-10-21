@@ -11,6 +11,12 @@
 
   <h1>Markdown Editor</h1>
 
+<div class="view-toggle-bar">
+    <button type="button" id="btn-view-split" class="active">💻 Split View</button>
+    <button type="button" id="btn-view-input">✍️ Solo Editor</button>
+    <button type="button" id="btn-view-preview">👁️ Solo Anteprima</button>
+</div>
+
 <div class=push>
   <button type="button" id="btn-bold" title="Grassetto Ctrl+b"><b>B</b></button>
   <button type="button" id="btn-italic" title="Corsivo Ctrl+i"><b><i>i</i></b></button>
@@ -32,7 +38,7 @@
   <button type="button" id="btn-warning" title="Avviso">⚠️</button>
 </div>
 
-<div class="editor-container">
+<div id="editor-wrapper" class="editor-container split-view">
   <textarea id="markdown-input" placeholder="Scrivi qui in Markdown..."></textarea>
   <div id="preview"></div>
 </div>
