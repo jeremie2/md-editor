@@ -2,20 +2,28 @@
 
 Testing/learning how to insert and customize a markdown editor into a `html` page.
 
-> ⚠️ At the moment is just a learning project, NOT super tasted... take it in consideration before use it in production.
+> ⚠️ At the moment it'is just a learning project, NOT super tasted... take it in consideration before using it in production.
+
+> 📝 I apologize if the example and a good part of the *html* interface is in Italian. I did so to make thing easier as this experiment could be use in an Italian project. At least it's very easy to change it!  😜
 
 # How to test it
 
 1. Download the repo folder.
-2. Clic on the `index.html` file or open this file with your browser.
+2. Clic on the `index.html` file or open it with your browser.
 
-While writing into the left edit area, you will immediately see the result into the right preview area. 
+While writing into the left edit area, you will immediately see the result into the right preview area. Single views of the edit and preview area are available.
 
-# Some details
+Some shortcuts available:
+
+- **Bold**: `Ctrl+b`
+- *Italic*: `Ctrl+i`
+- `Monospace` (tt): <code>Ctrl+`</code>
+
+# More details
 
 - Expectations: use as less javascript as possible.
-  - The `marked.umd.js` [file](https://cdn.jsdelivr.net/npm/marked@latest/lib/) from the [marked.js](https://marked.js.org/) project is used as *markdown to html* parser.
-  - Inside `buttons_editor.js` are all the custom functions to initialize the editor and makes every button works.
+  - The `marked.umd.js` [file](https://cdn.jsdelivr.net/npm/marked@latest/lib/) from the [marked.js](https://marked.js.org/) project is the *markdown to html* parser.
+  - Inside `buttons_editor.js` are all the custom functions to initialize the editor and make every button works.
   - (Still work in progress!) Inside the [doc](https://github.com/jeremie2/md-editor/tree/main/doc) folder you'll find all the functions documented line by line.
 - Except for the `js` files, then there are just an `index.html` and `style.css`... end of the game.
 - The page theme follows the system theme:
@@ -23,7 +31,3 @@ While writing into the left edit area, you will immediately see the result into 
     ![dark](img/md_dark.png)
   - Light:
     ![light](img/md_light.png)  
-
-
-
-
