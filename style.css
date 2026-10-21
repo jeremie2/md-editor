@@ -161,4 +161,7 @@ button.active {
     blockquote p {
         color: #333;
     }
+    button.active {
+        background-color: #fce3d0;
+    }
 }
