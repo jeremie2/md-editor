@@ -25,7 +25,7 @@ function execInsert(newText, start, end) {
   }
 }
 
-// :::::::::::::::::::::: AROUND SYMBOLS (bold, italic, tt...)
+// :::::::::::::::::::::: SYMMETRICAL SYMBOLS (bold, italic, tt...)
 
 function insertMarkdown(startSymbol, endSymbol = startSymbol, placeholder = "") {
     markdownInput.focus();
@@ -189,7 +189,7 @@ document.getElementById('btn-img').addEventListener('click', () => {
     const template = '\n<div align="center">\n  <img src="img.png" width="400">\n</div>\n';
     execInsert(template, start, end);
     
-    // The `img.png` example will be immediately selected to
+    // The `img.png` string will be immediately selected to
     // change it quickly. 
     const offsetStart = start + 34;
     markdownInput.setSelectionRange(offsetStart, offsetStart + 7);
