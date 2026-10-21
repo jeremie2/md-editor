@@ -89,6 +89,37 @@ blockquote p {
 }
 
 /* ################################### */
+/* ##### VIEWS (editor/preview) ###### */
+/* ################################### */
+
+/* Split View (both half screen) */
+.editor-container.split-view #markdown-input,
+.editor-container.split-view #preview {
+    display: block;
+    flex: 1;
+}
+button.active {
+    border: 3px solid #cd4f04;
+    background-color: #5f2704;
+}
+/* Only editor */
+.editor-container.only-input #preview {
+    display: none;
+}
+.editor-container.only-input #markdown-input {
+    display: block;
+    flex: 1;
+}
+/* Only preview */
+.editor-container.only-preview #markdown-input {
+    display: none;
+}
+.editor-container.only-preview #preview {
+    display: block;
+    flex: 1;
+}
+
+/* ################################### */
 /* ########### LIGHT MODE ############ */
 /* ################################### */
 
