@@ -239,3 +239,30 @@ markdownInput.addEventListener('keydown', (e) => {
         }
     }
 });
+
+// :::::::::::::::::::::: VIEWS (Split, Input, Preview)
+
+const editorWrapper = document.getElementById('editor-wrapper');
+const btnSplit = document.getElementById('btn-view-split');
+const btnInput = document.getElementById('btn-view-input');
+const btnPreview = document.getElementById('btn-view-preview');
+
+function changeView(viewClass, activeButton) {
+    // Clean up every classes and add the selected class.
+    editorWrapper.classList.remove('split-view', 'only-input', 'only-preview');
+    editorWrapper.classList.add(viewClass);
+    
+    [btnSplit, btnInput, btnPreview].forEach(btn => btn.classList.remove('active'));
+    activeButton.classList.add('active');
+    
+    // It forces "focus out" from input.
+    if (viewClass === 'only-preview') {
+        markdownInput.blur();
+    } else {
+        markdownInput.focus();
+    }
+}
+
+btnSplit.addEventListener('click', () => changeView('split-view', btnSplit));
+btnInput.addEventListener('click', () => changeView('only-input', btnInput));
+btnPreview.addEventListener('click', () => changeView('only-preview', btnPreview));
