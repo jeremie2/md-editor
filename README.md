@@ -20,9 +20,9 @@ While writing into the left edit area, you will immediately see the result into 
 - Except for the `js` files, then there are just an `index.html` and `style.css`... end of the game.
 - The page theme follows the system theme:
   - Dark:
-    ![dark](md_dark.png)
+    ![dark](img/md_dark.png)
   - Light:
-    ![light](md_light.png)  
+    ![light](img/md_light.png)  
 
 
 
