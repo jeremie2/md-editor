@@ -13,21 +13,21 @@ Testing/learning how to insert and customize a markdown editor into a `html` pag
 
 While writing into the left edit area, you will immediately see the result into the right preview area. Single views of the edit and preview area are available.
 
-Some shortcuts available:
-
-- **Bold**: `Ctrl+b`
-- *Italic*: `Ctrl+i`
-- `Monospace` (tt): <code>Ctrl+`</code>
-
-# More details
-
-- Expectations: use as less javascript as possible.
-  - The `marked.umd.js` [file](https://cdn.jsdelivr.net/npm/marked@latest/lib/) from the [marked.js](https://marked.js.org/) project is the *markdown to html* parser.
-  - Inside `buttons_editor.js` are all the custom functions to initialize the editor and make every button works.
-  - (Still work in progress!) Inside the [doc](https://github.com/jeremie2/md-editor/tree/main/doc) folder you'll find all the functions documented line by line.
-- Except for the `js` files, then there are just an `index.html` and `style.css`... end of the game.
+- Some shortcuts available:
+  - **Bold**: `Ctrl+b`
+  - *Italic*: `Ctrl+i`
+  - `Monospace` (tt): <code>Ctrl+`</code>
+- The immage button uses *html* format. This makes pictures formatting much more flexible, directly controlling dimentions (`width="..."`) and alignment (`align="..."` *center/left/right*).
 - The page theme follows the system theme:
   - Dark:
     ![dark](img/md_dark.png)
   - Light:
-    ![light](img/md_light.png)  
+    ![light](img/md_light.png) 
+
+# More details
+
+- Expectations: use as less javascript as possible avoiding the need of frameworks that require other frameworks.
+- The `marked.umd.js` [file](https://cdn.jsdelivr.net/npm/marked@latest/lib/) from the [marked.js](https://marked.js.org/) project is the *markdown to html* parser.
+- Inside `buttons_editor.js` are all the custom vanilla js functions to initialize the editor and make every button work.
+- (Still work in progress!) Inside the [doc](https://github.com/jeremie2/md-editor/tree/main/doc) folder you'll find all the functions documented line by line.
+- Except for the `js` files, then there are just an `index.html` and `style.css`... end of the game. The target is to have an easy customizable and still future rich editor able to produce client side previews.
