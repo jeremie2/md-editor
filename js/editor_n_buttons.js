@@ -157,12 +157,12 @@ document.getElementById('btn-bold').addEventListener('click', () => insertMarkdo
 document.getElementById('btn-italic').addEventListener('click', () => insertMarkdown('*', '*', ''));
 document.getElementById('btn-tt').addEventListener('click', () => insertMarkdown('`', '`', ''));
 document.getElementById('btn-codeblock').addEventListener('click', toggleCodeBlock);
-document.getElementById('btn-quote').addEventListener('click', () => toggleLineSymbol('> '));
 document.getElementById('btn-br').addEventListener('click', () => insertMarkdown('', '<br>', ''));
 document.getElementById('btn-comment').addEventListener('click', () => insertMarkdown('<!--', '-->', 'testo'));
 
 document.getElementById('btn-bullet').addEventListener('click', () => toggleLineSymbol('- '));
 document.getElementById('btn-num').addEventListener('click', () => toggleLineSymbol('1. '));
+document.getElementById('btn-quote').addEventListener('click', () => toggleLineSymbol('> '));
 
 document.getElementById('btn-h1').addEventListener('click', () => toggleLineSymbol('# '));
 document.getElementById('btn-h2').addEventListener('click', () => toggleLineSymbol('## '));
@@ -185,6 +185,8 @@ document.getElementById('btn-link').addEventListener('click', () => {
     markdownInput.setSelectionRange(offsetStart, offsetStart + 19);
     updatePreview();
 });
+
+document.getElementById('btn-anchor').addEventListener('click', () => insertMarkdown('', '<a id="nome_anchor"></a>', ''));
 
 document.getElementById('btn-img').addEventListener('click', () => {
     markdownInput.focus();
