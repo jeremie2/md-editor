@@ -48,12 +48,43 @@ updatePreview();
   > - **updatePreview** is passed to the function without parenthesis (). This because this way the function is not immediately run, but it will run just when the *input* event occours.
 
 - **markdownInput.value = 'bla bla bla... default markdown code'**
-
+- 
   We update the  the text area with a default markdown code, using the **.value** method as already seen.
 
 - **updatePreview()** 
 
   It's called again to actualize the rendered text in the preview area.
+
+<a id="common"></a>
+
+# A common pattern
+Most of the following functions will start like this:
+
+- **markdownInput.focus()**: it makes sure the input text area takes the focus.
+
+- **const text = markdownInput.value**: represents the whole text inside the input text area.
+
+- **Start & end of a selection**
+
+  - **const start = markdownInput.selectionStart**: define the begin of selected text. It is an integer that represents the position of the **first char** of the selected text.
+
+  - **const end = markdownInput.selectionEnd**: define the end of selected text. But the integer represent the position of the **last char + 1**.
+  
+  Let's see a practical example with the string `not bad yeah`. If we select the word `bad` it will be:
+  - **const start = 4**   ... position of character b
+  - **const end = 7**   ... one position right after character d
+  
+  ```
+  index:  0123456789...
+  chars:  not bad yeah
+              |  |
+              4  |
+                 7 -> index of first position after `bad`
+  ```
+  
+- **const selected = text.substring(start, end)**: represents the actual selected string. In the previous example `text.substring(4, 7)` is exactly the word `bad`.
+
+<a id="helper"></a>
 
 # Helper function for Ctrl+z
 
@@ -76,15 +107,11 @@ function execInsert(newText, start, end) {
 
 - **newText**: new text that we want to modify as `**text**`, `- raw`, etc. Let's take the string `ciao` as example and pretend it is first string at the beginning of the input area. 
 
-- **start** & **end**
+- **start** & **end**: both will be set in every function that will use **execInsert()** as helper function, and they will represent the index of the **first char** and **last char + 1** of a text selection.
 
-  > Both **start** & **end** will be set in the following functions that will use **execInsert()** as helper function by **markdownInput.selectionStart** and **markdownInput.selectionEnd**.
+  > 💡See the [common pattern](#common) section for more details.
 
-  * **start**: numerical index position of the first character, from which we'll apply the change. In our example the character `c` will be in **position 0**.
-
-  * **end**: numerical index position of the last character + 1. Character `o` is in **position 3**. To include the last character we need to set the next one, so that **end** will be **4**.
-
-- If a user has selected a string, **.setSelectionRange(start, end)** makes so that this string is selected from the firs to the last character. If there isn't any selection then **start** and **end** get the same value.
+- If a user has selected a string, **.setSelectionRange(start, end)** makes so that this string is selected from the first to the last character. If there isn't any selection then **start** and **end** get the same value.
 
 - **document.execCommand('insertText', false, newText)** instead of replacing some text it simulates the user typing or pasting the content of **newText** over the area selected with **setSelectionRange()**.
 
@@ -97,7 +124,7 @@ function execInsert(newText, start, end) {
   2. We paste the **newText**.
   3. We add the remaining part of the selected area **text.substring(end)**.
 
-Let's see a practical example with the string `not bad yeah. We want to target the word bed` to insert the **Bold**: symbols `**` around the word: `**bad**`:
+Let's see a practical example with the string `not bad yeah. We want to target the word bed` to insert the **Bold**: symbols `**` around the word so it becomes: `**bad**`:
 
 ```
 index:  0123456789...
@@ -106,11 +133,6 @@ chars:  not bad yeah
             4 6|
                7 -> index of first position after `bad`
 ```
-
-We want to target the word **bad**.
-
-- `selectionStart` = 4   ... position of character `b`
-- `selectionEnd` = 7  ... one position right after character `d`
 
 1. Clicking the **B** button after selecting the word, it will be called:
 
@@ -149,10 +171,9 @@ We set **insertMarkdown()** function so that it **append** markdown symbols arou
 - **endSymbol**: obviously must be equal to the firs one and is set `= startSymbol`.
 - **placeholder**: optionally some text insert as example.
 
-Befor doing anything **markdownInput.focus()** forces the focus into the input area. Then some costants are set:
+Before doing anything **markdownInput.focus()** forces the focus into the input area and some constant  (**start**, **end**, **text**...) that define the text selection are set.
 
-- **start** and **end**: integers that define the beginning `markdownInput.selectionStart` and the end `markdownInput.selectionEnd` of a text selection. More precisely the index of the firs character and the index of the last character +1.  If there is no selection, then **start** will be equal **end**.
-- **text** and **selected**: the whole content `markdownInput.value` and the part of the content selected by the user `text.substring(start, end)`.
+> 💡 See the [common pattern](#common) for more details.
 
 ```js
 function insertMarkdown(startSymbol, endSymbol = startSymbol, placeholder = "") {
@@ -214,16 +235,71 @@ At this point we store the position of the new selection updating variables:
 
 ## Toggle ON
 
-If markdown symbols are not present the **else** block will add them.
+If markdown symbols are not present, the **else** block will add them.
 
-- **const defaultText = selected || placeholder**: if there is a selected text, it will be used, otherwise the **placeholder** will be used instead.
+- **const defaultText = selected || placeholder**: if there is a selected text, it will be used, otherwise a **placeholder** will be used instead.
 
-  > At this stage the function signature shows `placeholder = ""`. It could be removed but it has been decided to leave it as it is just in case in future evolution we decide to set e default string, like for instance: `"text"`.
+  > At this stage the function signature shows `placeholder = ""`. It could be removed but it has been decided to leave it just in case in future evolution we decide to set e default string, like for instance: `"text"`.
 
 - **newText = startSymbol + defaultText + endSymbol**: the markdown symbols are added at the edges of the selected text.
 - The new selection will be stored into variables:
   - **selectionOffsetStart = start**
   - **selectionOffsetEnd = start + newText.length**
 
-# work in progress!
+## Applying changes
 
+- **execInsert(newText, start, end)**: our helper function insert the new text into the input taking the place of the old text and preserving the `Ctrl+z` functionality.
+-  **markdownInput.setSelectionRange(selectionOffsetStart, selectionOffsetEnd)**; sets the new selection so that the user can click on the button again to revert the action.
+- **updatePreview()**: the preview gets rendered as *html*.
+
+# Line symbol
+
+**toggleLineSymbol()** takes care of Title (`#` ), quote (`>` ), list (`-` ) and other symbols that work on a line or block of lines. There is just a "*start symbol*" at the beginning of a line. 
+
+- Before doing anything **markdownInput.focus()** forces the focus into the input area and constant  **text**, **start** and **end** that define the text selection are set.
+
+  > 💡 See the [common pattern](#common) for more details.
+
+- **selectionStartLineStart**:      **WORK IN PROGRESS !!!**
+
+```js
+function toggleLineSymbol(symbol) {
+  markdownInput.focus();
+
+  const start = markdownInput.selectionStart;
+  const end = markdownInput.selectionEnd;
+  const text = markdownInput.value;
+  const selectionStartLineStart = text.lastIndexOf('\n', start - 1) + 1;
+  
+  let selectionEndLineEnd = text.indexOf('\n', end);
+  if (selectionEndLineEnd === -1) selectionEndLineEnd = text.length;
+
+  const fullLinesText = text.substring(selectionStartLineStart, selectionEndLineEnd);
+  const lines = fullLinesText.split('\n');
+  const isRemoving = lines[0].startsWith(symbol);
+  
+  const updatedLines = lines.map(line => {
+    if (isRemoving) {
+      return line.startsWith(symbol) ? line.substring(symbol.length) : line;
+    } else {
+      return symbol + line;
+    }
+  });
+
+  const newLinesText = updatedLines.join('\n');
+  execInsert(newLinesText, selectionStartLineStart, selectionEndLineEnd);
+
+  if (start === end) {
+    // Se era solo un cursore singolo (senza selezione), spostalo in modo naturale
+    const delta = isRemoving ? -symbol.length : symbol.length;
+    const newCursorPos = Math.max(selectionStartLineStart, start + delta);
+    markdownInput.setSelectionRange(newCursorPos, newCursorPos);
+  } else {
+    markdownInput.setSelectionRange(selectionStartLineStart, selectionStartLineStart + newLinesText.length);
+  }
+
+  updatePreview();
+}
+```
+
+# WORK IN PROGRESS
