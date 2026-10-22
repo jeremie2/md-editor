@@ -1,6 +1,6 @@
 # Intro
 
-This document explains the functionality inside `buttons_editor.js`. It might not be up to date, some functions might be changed over the time, but the "big picture" should remain the same.
+This document explains the functionality inside `editor_n_buttons.js`. It might not be up to date, some functions might be changed over the time, but the "big picture" should remain the same.
 
 # Startup phase
 
