@@ -6,7 +6,7 @@ Testing/learning how to insert and customize a markdown editor into a `html` pag
 
 > 📝 I apologize if the example and a good part of the *html* interface is in Italian. I did so to make thing easier as this experiment could be use in an Italian project. At least it's very easy to change it!  😜
 
-# How to test it
+# Try it
 
 1. Download the repo folder.
 2. Clic on the `index.html` file or open it with your browser.
