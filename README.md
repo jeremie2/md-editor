@@ -28,6 +28,6 @@ While writing into the left edit area, you will immediately see the result into 
 
 - Expectations: use as less javascript as possible avoiding the need of frameworks that require other frameworks.
 - The `marked.umd.js` [file](https://cdn.jsdelivr.net/npm/marked@latest/lib/) from the [marked.js](https://marked.js.org/) project is the *markdown to html* parser.
-- Inside `buttons_editor.js` are all the custom vanilla js functions to initialize the editor and make every button work.
+- Inside `editor_n_buttons.js` are all the custom vanilla js functions to initialize the editor and make every button work.
 - (Still work in progress!) Inside the [doc](https://github.com/jeremie2/md-editor/tree/main/doc) folder you'll find all the functions documented line by line.
 - Except for the `js` files, then there are just an `index.html` and `style.css`... end of the game. The target is to have an easy customizable and still future rich editor able to produce client side previews.
