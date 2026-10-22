@@ -141,3 +141,89 @@ chars:  not **bad** yeah
 
 `execInsert()` has finished its work. The main function will now lead the game and place the cursor in a new position.
 
+# Insert markdown
+
+We set **insertMarkdown()** function so that it **append** markdown symbols around a text or an empty string, but it will also check if those symbols are already there. In that case it will **remove** them. It definitely works as a *toggle*. 
+
+- **startSymbol**: initial symbol (for instance `**` for bold).
+- **endSymbol**: obviously must be equal to the firs one and is set `= startSymbol`.
+- **placeholder**: optionally some text insert as example.
+
+Befor doing anything **markdownInput.focus()** forces the focus into the input area. Then some costants are set:
+
+- **start** and **end**: integers that define the beginning `markdownInput.selectionStart` and the end `markdownInput.selectionEnd` of a text selection. More precisely the index of the firs character and the index of the last character +1.  If there is no selection, then **start** will be equal **end**.
+- **text** and **selected**: the whole content `markdownInput.value` and the part of the content selected by the user `text.substring(start, end)`.
+
+```js
+function insertMarkdown(startSymbol, endSymbol = startSymbol, placeholder = "") {
+    markdownInput.focus();
+    const start = markdownInput.selectionStart;
+    const end = markdownInput.selectionEnd;
+    const text = markdownInput.value;
+    const selected = text.substring(start, end);
+
+    let newText = "";
+    let selectionOffsetStart = 0;
+    let selectionOffsetEnd = 0;
+
+    // Toggle OFF
+    if (selected.startsWith(startSymbol) && selected.endsWith(endSymbol)) {
+        newText = selected.substring(startSymbol.length, selected.length - endSymbol.length);
+        selectionOffsetStart = start;
+        selectionOffsetEnd = start + newText.length;
+    } 
+    // Toggle ON
+    else {
+        const defaultText = selected || placeholder;
+        newText = startSymbol + defaultText + endSymbol;
+        
+        selectionOffsetStart = start;
+        selectionOffsetEnd = start + newText.length;
+    }
+
+    execInsert(newText, start, end);
+    markdownInput.setSelectionRange(selectionOffsetStart, selectionOffsetEnd);
+    updatePreview();
+}
+```
+
+## Get ready for the text
+
+We need to build the new text with markdown symbols added on both sides. Therefore we prepare **newText** as empty string and **selectionOffsetStart** and **selectionOffsetEnd** as the new *start* and *end* ones they get built.
+
+## Toggle OFF
+
+The **if** block checks whether the selected text start already with markdown symbols:
+```sh
+ if selected.startsWith(startSymbol) && selected.endsWith(endSymbol)
+```
+
+If that is true they will be removed setting **newText** as:
+
+```js
+selected.substring(startSymbol.length, selected.length - endSymbol.length)
+```
+
+For instance let's take the string `**ciao**` made of 8 chars: **startSymbol.length** (symbols `**` take 2 chars) move the beginning of the substring to character **c**.
+ **endSymbol.length** takes 2 chars too and we subtract it from **selected.length**. After cutting the `**` from the edges of the selected text, what remains is just: `ciao`.
+
+At this point we store the position of the new selection updating variables:
+
+- **selectionOffsetStart = start**
+- **selectionOffsetEnd = start + newText.length**
+
+## Toggle ON
+
+If markdown symbols are not present the **else** block will add them.
+
+- **const defaultText = selected || placeholder**: if there is a selected text, it will be used, otherwise the **placeholder** will be used instead.
+
+  > At this stage the function signature shows `placeholder = ""`. It could be removed but it has been decided to leave it as it is just in case in future evolution we decide to set e default string, like for instance: `"text"`.
+
+- **newText = startSymbol + defaultText + endSymbol**: the markdown symbols are added at the edges of the selected text.
+- The new selection will be stored into variables:
+  - **selectionOffsetStart = start**
+  - **selectionOffsetEnd = start + newText.length**
+
+# work in progress!
+
