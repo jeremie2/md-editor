@@ -124,7 +124,7 @@ function execInsert(newText, start, end) {
   2. We paste the **newText**.
   3. We add the remaining part of the selected area **text.substring(end)**.
 
-Let's see a practical example with the string `not bad yeah. We want to target the word bed` to insert the **Bold**: symbols `**` around the word so it becomes: `**bad**`:
+Let's see a practical example with the string `not bad yeah`. We want to target the word bed to insert the **Bold**: symbols `**` around the word so it becomes: `**bad**`:
 
 ```
 index:  0123456789...
@@ -254,13 +254,9 @@ If markdown symbols are not present, the **else** block will add them.
 
 # Line symbol
 
-**toggleLineSymbol()** takes care of Title (`#` ), quote (`>` ), list (`-` ) and other symbols that work on a line or block of lines. There is just a "*start symbol*" at the beginning of a line. 
+**toggleLineSymbol()** takes care of Title (`#` ), quote (`>` ), list (`-` ) and other symbols that work on a line or block of lines. There is just a "*start symbol*" at the beginning of a line.
 
-- Before doing anything **markdownInput.focus()** forces the focus into the input area and constant  **text**, **start** and **end** that define the text selection are set.
-
-  > 💡 See the [common pattern](#common) for more details.
-
-- **selectionStartLineStart**:      **WORK IN PROGRESS !!!**
+## Setting text selections
 
 ```js
 function toggleLineSymbol(symbol) {
@@ -275,9 +271,70 @@ function toggleLineSymbol(symbol) {
   if (selectionEndLineEnd === -1) selectionEndLineEnd = text.length;
 
   const fullLinesText = text.substring(selectionStartLineStart, selectionEndLineEnd);
-  const lines = fullLinesText.split('\n');
-  const isRemoving = lines[0].startsWith(symbol);
   
+  // END OF THE FIRST PART
+```
+
+- Before doing anything **markdownInput.focus()** forces the focus into the input area and constant  **text**, **start** and **end** that define the text selection are set.
+
+  > 💡 See the [common pattern](#common) for more details.
+
+- **const selectionStartLineStart**:
+  It is set as `text.lastIndexOf('\n', start - 1) + 1` but first let's see how **lastIndexOf()** works because it could looks tricky. It search the last occurrence of a char or string slice, but it does going **from right to left**.
+  
+  Let's take this example: `my_string = "x or y? x"` 
+  
+  ```
+  0123456789  <-- index
+  x or y? x   <-- my_string
+  ```
+  
+  **my_string.lastIndexOf('x')** returns **8** because starting from the end it intercepts the last **x** character.
+  
+  We can set a specific index from which starting the research `my_string.lastIndexOf(string, index)`.
+  
+  **my_string.lastIndexOf('x', 3)** returns **0** because starting from index **3** it will intercept the first occurrence of **x**.
+  
+  Let's take in consideration our specific case: **text.lastIndexOf('\n', start - 1) + 1**.
+  
+  We start from index `start - 1` which means an index **before our selection**. The method find the first occurrence of the `\n` new line character. But adding **+1** we actually get the first position of our current line.
+  
+  > 📝 If it doesn't find any **\n** it will return **-1** but adding adding **+1** we get the beginning of our current line anyway!
+  
+- **const selectionEndLineEnd**: this time we simply use the **indexOf()** method: `text.indexOf('\n', end)` which will find (if it exists) the index of next `\n`, otherwise it takes the full text length with the next step:
+
+  ```js
+  if (selectionEndLineEnd === -1) selectionEndLineEnd = text.length;
+  ```
+
+  > 📝 We have checked for `\n` around our selection. Inside our selection there could be `\n` symbols and it's fine! Our button will work also on a multi-line selection, from this:
+  >
+  > ```
+  > bla bla
+  > bla
+  > ```
+  > 
+  >to this:
+  > 
+  >```
+  > # bla bla
+  > # bla
+  > ```
+  
+- **fullLinesText**: is the actual text selection `text.substring(selectionStartLineStart, selectionEndLineEnd)`
+
+- **const lines = fullLinesText.split('\n')**: selected text is split into lines.
+
+## Adding symbols
+
+```js
+  // 2nd PART
+  
+  const lines = fullLinesText.split('\n');
+    
+  // Toggle function: if symbols are present, they will be removed.
+  // Otherwise symbols will be added.
+  const isRemoving = lines[0].startsWith(symbol);
   const updatedLines = lines.map(line => {
     if (isRemoving) {
       return line.startsWith(symbol) ? line.substring(symbol.length) : line;
@@ -287,6 +344,31 @@ function toggleLineSymbol(symbol) {
   });
 
   const newLinesText = updatedLines.join('\n');
+```
+
+Selected text will be split in a array of **lines**: `const lines = fullLinesText.split('\n')`
+
+- **isRemoving**: gets a boolean value checking whether the first character of a line is already the symbol we want to add: `lines[0].startsWith(symbol)`.
+
+- **updateLines**: is a new array of lines built via `lines.map()`. Inside it we check the condition **isRemoving** and if a line has already got a symbol, it will be removed and the new array will just have lines without symbol:
+
+  ```js
+  return line.startsWith(symbol) ? line.substring(symbol.length) : line
+  ```
+
+  If every line has not got any symbol, then symbols will be added in the else block:
+
+  ```js 
+  return symbol + line
+  ```
+
+- **newLinesText**: Finally we join the new formatted lines **updatedLines.join('\n')**.
+
+## Inserting the new text
+
+```js
+ // PART 3
+
   execInsert(newLinesText, selectionStartLineStart, selectionEndLineEnd);
 
   if (start === end) {
