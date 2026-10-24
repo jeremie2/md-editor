@@ -46,10 +46,7 @@ p {
     line-height: 1.5;
 }
 a:link, a:visited, a:hover, a:active {
-    /*color: #d05d19;*/
-    /*font-weight: bold;*/
     color: #fff;
-    /*color: #cbcbcb;*/
     text-decoration: underline;
     text-decoration-color: #ff9c61;
     text-decoration-thickness: 2px;
@@ -76,21 +73,28 @@ a:link, a:visited, a:hover, a:active {
     overflow-y: auto;
 }
 pre, code {
-    background-color: #211f1f;
+    background-color: #2d2d2d;
 }
 pre {
     border: 1px solid #d05d19;
-    margin-top: 15px;
-    margin-bottom: 15px;
-    padding: 8px;
+    margin: .5em 0;
+    padding: 0.7em;
     border-radius: 10px;
 }
 code {
-    color: #7ae9e4;
+    color: #f2b089;
     font-family: monospace;
     font-size: 18px;
-    padding: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 4px;
+    padding-right: 4px;
+    border: 1px solid #d05d19;
     border-radius: 4px; 
+}
+pre code {
+    border: none;
+    padding: 0;
 }
 ul, ol {
     margin-top: 15px;
@@ -179,11 +183,12 @@ button.active {
         color: #333;
     }
     pre {
-        background-color: #c5f4f0;
+        background-color: #f1e8e3;
     }
     code {
-        color: #333;
-        background-color: #c5f4f0;
+        color: #cb650a;
+        background-color: #f1e8e3;
+        border: 1px solid #984514;
     }
     #preview, #markdown-input {
         background-color: #f6f5f5;
