@@ -89,7 +89,7 @@ code {
     padding-bottom: 2px;
     padding-left: 4px;
     padding-right: 4px;
-    border: 1px solid #d05d19;
+    border: 1px solid #984514;
     border-radius: 4px; 
 }
 pre code {
@@ -188,7 +188,7 @@ button.active {
     code {
         color: #cb650a;
         background-color: #f1e8e3;
-        border: 1px solid #984514;
+        border: 1px solid #e1b499;
     }
     #preview, #markdown-input {
         background-color: #f6f5f5;
