@@ -6,27 +6,64 @@
   theme.
 */
 
+/* ################################### */
+/* #########     RESET +    ########## */
+/* ######### GENERAL LAYOUT ########## */
+/* ################################### */
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+ul, ol {
+    padding-left: 2rem;
+}
+body {
+    margin: 20px;
+}
+#markdown-input, #preview {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+/* ################################### */
+/* ############## BEGIN ############## */
+/* ################################### */
+
 body {
     font-family: sans-serif;
-    font-size: 20px;
-    margin: 20px;
+    font-size: 18px;
     background-color: #232323;
     color: #e1e1e1;
 }
+h1 {
+    margin-bottom: 20px;
+}
+p {
+    line-height: 1.5;
+}
 a:link, a:visited, a:hover, a:active {
-    color: #f77b32;
+    /*color: #d05d19;*/
+    /*font-weight: bold;*/
+    color: #fff;
+    /*color: #cbcbcb;*/
+    text-decoration: underline;
+    text-decoration-color: #ff9c61;
+    text-decoration-thickness: 2px;
 }
 .editor-container {
     display: flex;
     gap: 15px;
-    height: 650px;
+    height: 800px;
 }
 #markdown-input, #preview {
     flex: 1;
     background-color: #35353d;
     border: 2px solid #d05d19;
     height: 100%;
-    padding: 10px;
     border-radius: 10px;
     box-sizing: border-box;
     overflow-y: auto;
@@ -36,27 +73,38 @@ a:link, a:visited, a:hover, a:active {
     resize: none;
     font-family: monospace;
     font-size: 20px;
+    overflow-y: auto;
+}
+pre, code {
+    background-color: #211f1f;
 }
 pre {
-    background-color: #211f1f;
     border: 1px solid #d05d19;
-    font-family: monospace;
+    margin-top: 15px;
+    margin-bottom: 15px;
     padding: 8px;
     border-radius: 10px;
 }
 code {
     color: #7ae9e4;
-    background-color: #211f1f;
     font-family: monospace;
     font-size: 18px;
     padding: 2px;
     border-radius: 4px; 
 }
+ul, ol {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+li {
+    margin-bottom: 5px; 
+}
 table {
     background-color: #2d2d2d;
     border: 2px solid #2d2d2d;
     box-shadow: 0 1px 4px #000;
-    margin: 0.5em 0px;
+    margin-top: 15px;
+    margin-bottom: 15px;
     border-collapse: collapse;
 }
 td, th {
@@ -82,6 +130,8 @@ blockquote {
 }
 blockquote p {
     color: #b0b0b0;
+    margin-top: 15px;
+    margin-bottom: 15px;
     padding-top: 10px;
     padding-bottom: 10px;
     padding-left: 20px;
@@ -100,7 +150,7 @@ blockquote p {
 }
 button.active {
     border: 3px solid #cd4f04;
-    background-color: #5f2704;
+    /*background-color: #5f2704;*/
 }
 /* Only editor */
 .editor-container.only-input #preview {
@@ -140,7 +190,7 @@ button.active {
         color: #333;
     }
     a:link, a:visited, a:hover, a:active {
-        color: #e45f11;
+        color: #000;
     }
     table {
         background-color: #e3e3e3;
@@ -156,12 +206,10 @@ button.active {
         color: #333;
     }
     blockquote {
-        background-color: #e3e3e3;
+        background-color: #dfecfb;
+        color: #333;
     }
     blockquote p {
         color: #333;
-    }
-    button.active {
-        background-color: #fce3d0;
     }
 }
