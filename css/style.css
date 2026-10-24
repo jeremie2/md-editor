@@ -93,8 +93,13 @@ code {
     border-radius: 4px; 
 }
 pre code {
+    color: #ccc;
     border: none;
     padding: 0;
+}
+td code {
+    border: none;
+    background-color: #403c3c;
 }
 ul, ol {
     margin-top: 15px;
@@ -153,8 +158,7 @@ blockquote p {
     flex: 1;
 }
 button.active {
-    border: 3px solid #cd4f04;
-    /*background-color: #5f2704;*/
+    border: 4px solid #cd4f04;
 }
 /* Only editor */
 .editor-container.only-input #preview {
@@ -189,6 +193,13 @@ button.active {
         color: #cb650a;
         background-color: #f1e8e3;
         border: 1px solid #e1b499;
+    }
+    pre code {
+        color: #333;
+    }
+    td code {
+        border: none;
+        background-color: #f1e8e3;
     }
     #preview, #markdown-input {
         background-color: #f6f5f5;
