@@ -11,11 +11,16 @@ const preview = document.getElementById('preview');
 function updatePreview() {
   const text = markdownInput.value;
   preview.innerHTML = marked.parse(text);
+
+  // Prism syntax highlight
+  if (typeof Prism !== 'undefined') {
+    Prism.highlightAllUnder(preview);
+  }
 }
 
 markdownInput.addEventListener('input', updatePreview);
 
-markdownInput.value = '# Benvenuto!\n\nScrivi **grassetto**, *corsivo*...<br>...o `mono`.\n1. [Installare](https://duckduckgo.com) il pacchetto *firefox*:\n   ```\n   sudo apt install firefox\n   ```\n1. Selezionare ***File > Modifica > Chiudi*** e scrivere un *hello world* per il gusto di farlo:\n   ```\n   fn main() {\n      println!("ciao");\n   }\n   ```\n1. Ma un bel tabellozzo ce lo vogliamo mettere?\n   | Nome     | Cognome    | Età media |\n   | :--      | :--:       | --:       |\n   | Mario    | Rossi      | 100       |\n   | Mariella | Celandroni | 150       |';
+markdownInput.value = '# Benvenuto!\n\nScrivi **grassetto**, *corsivo*...<br>...o `mono`.\n1. [Installare](https://duckduckgo.com) il pacchetto *firefox*:\n   ```sh\n   sudo apt install firefox\n   ```\n1. Selezionare ***File > Modifica > Chiudi*** e scrivere un *hello world* per il gusto di farlo:\n   ```rust\n   fn main() {\n      println!("ciao");\n   }\n   ```\n1. Ma un bel tabellozzo ce lo vogliamo mettere?\n   | Nome     | Cognome    | Età media |\n   | :--      | :--:       | --:       |\n   | Mario    | Rossi      | 100       |\n   | Mariella | Celandroni | 150       |';
 updatePreview();
 
 // :::::::::::::::::::::: HELPER FOR INPUT WITH UNDO (Ctrl+z)
