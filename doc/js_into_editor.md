@@ -173,6 +173,35 @@ chars:  not **bad** yeah
 
 `execInsert()` has finished its work. The main function will now lead the game and place the cursor in a new position.
 
+# Easy insert
+
+The **easyInsert()** function just takes a templates from the event listener and place it into the input text area without worrying about selecting any text. It's basically an easy super short version of any function you'll see in this document.
+
+You'll recognize the initial setup [pattern](#common) (focus on input text area, set **text**, **start**, **end**). And then the [helper](#helper) function insert the text into the input area, while **updatePreview()** updates the rendered html view.
+
+```js
+function easyInsert(template) {
+  markdownInput.focus();
+  const start = markdownInput.selectionStart;
+  const end = markdownInput.selectionEnd;
+  const text = template;
+  
+  execInsert(text, start, end);
+  updatePreview();
+}
+```
+
+This is actually the function used to insert **tables** and here is its event listener (*the **template** might look chaotic!*):
+
+```js
+document.getElementById('btn-table').addEventListener('click', () => {
+  const template = '\n| Header 1 | Header 2 | Header 3 |\n| :---     | :---:    | ---:     |\n| Cella    | Cella    | Cella    |\n';
+  easyInsert(template);
+});
+```
+
+You'll see the call to `easyInsert(template)`.
+
 # Insert markdown
 
 We set **insertMarkdown()** function so that it **append** markdown symbols around a text or an empty string, but it will also check if those symbols are already there. In that case it will **remove** them. It definitely works as a *toggle*. 
@@ -475,5 +504,46 @@ We can now:
 2. update the selection: `markdownInput.setSelectionRange(selectionOffsetStart, selectionOffsetEnd)`;
 3. and run **updatePreview()**.
 
-# WORK IN PROGRESS
+# Notes, warnings...
 
+This function is used to build data as  **notes**, **warnings**, **advises**. In this case in the event listener we create the content: **header** and **message** lines. Let's see an example with notes.<br>This is the final result:
+
+```
+> 📝 **Nota**<br>           <-- header line
+Write here your note.       <-- message line
+```
+
+The event listener is:
+
+```js
+document.getElementById('btn-note').addEventListener('click', () => {
+    const header = '\n> 📝 **Note**<br>\n';
+    const template = 'Write here your note.\n';
+    insertNote(header, template);
+});
+```
+
+Here the function where as [usual](#common) we make sure the input text area is on focus and we set **start** and **end** selection.
+
+```js
+function insertNote(header, message) {
+  markdownInput.focus();
+  const start = markdownInput.selectionStart;
+  const end = markdownInput.selectionEnd;
+  const text = header + message
+  
+  execInsert(text, start, end);
+  
+  const selectStart = start + header.length;
+  markdownInput.setSelectionRange(selectStart, selectStart + message.length);
+  updatePreview();
+}
+```
+
+`execInsert(template, start, end)` will put the block in the input text area.
+
+Now we want the **message** to be selected. It's starting point will be exactly right after the **header**. We set  **selectStart** as `start + header.length`.<br>Then the end of the selection will be at the end of **message**, which is `selectStart + message.length`.
+
+Now we can run **updatePreview()** to update the rendered html view.
+
+# WORK IN PROGRESS
