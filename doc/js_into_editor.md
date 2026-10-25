@@ -390,6 +390,7 @@ We have got the new block of text **newLinesText**. **execInsert()** will delete
     const newCursorPos = Math.max(selectionStartLineStart, start + delta);
     markdownInput.setSelectionRange(newCursorPos, newCursorPos);
   } else {
+    // Text selection case. 
     markdownInput.setSelectionRange(selectionStartLineStart, selectionStartLineStart + newLinesText.length);
   }
 
@@ -415,10 +416,64 @@ We have got the new block of text **newLinesText**. **execInsert()** will delete
 
     * **start** (cursor position): **4**
     * **delta**: we are adding so it's **+2** because '`# `' is 2 chars long.
-    *  **newCursorPos**: start + delta = **6**
+    * **newCursorPos**: start + delta = **6**
 
 - **Selection case**: in this case we want the new text to be selected. The argument of **markdownInput.setSelectionRange** will be the the original begin of the line `selectionStartLineStart` and the end will be the beginning of the line plus the length of the new text `selectionStartLineStart + newLinesText.length`.
 
 **updatePreview()** applies the modification updating the html view.
 
+# Code block
+
+Before doing anything **markdownInput.focus()** forces the focus into the input area and constant  **text**, **start**, **end**, **selected**, etc... that define the text selection are set.
+
+> 💡 See the [common pattern](#common) for more details.
+
+**isCodeBlock** checks whether the selected text start with <code>\```\n</code> and ends with <code>\n```</code>.
+
+```js
+function toggleCodeBlock() {
+  markdownInput.focus();
+
+  const start = markdownInput.selectionStart;
+  const end = markdownInput.selectionEnd;
+  const text = markdownInput.value;
+  const selected = text.substring(start, end);
+
+  let newText = "";
+  let selectionOffsetStart = 0;
+  let selectionOffsetEnd = 0;
+
+  const isCodeBlock = selected.startsWith("```\n") && selected.endsWith("\n```");
+
+  if (isCodeBlock) {
+    newText = selected.substring(4, selected.length - 4);
+    selectionOffsetStart = start;
+    selectionOffsetEnd = start + newText.length;
+  } else {
+    const defaultText = selected || "scrivi qui il codice";
+    newText = "```\n" + defaultText + "\n```";
+    selectionOffsetStart = start + 4;
+    selectionOffsetEnd = start + 4 + defaultText.length;
+  }
+
+  execInsert(newText, start, end);
+  markdownInput.setSelectionRange(selectionOffsetStart, selectionOffsetEnd);
+  updatePreview();
+}
+```
+
+- **If selection is a code block**: as the new line character is considered as single char, the symbols are made of 4 chars. **newText** will be a sub-string: `selected.substring(4, selected.length - 4)`.<br>**selectionOffsetStart** will be the same of **start**, while **selectionOffsetEnd** is going to be `start + newText.length`.
+- **If selection isn't a code block**: **defaultText** will be set as selected text or a default text example. Then **newText** will be `"```\n" + defaultText + "\n```"`
+
+- Then we have to set the new selected area. If we insert the symbols we want the text inside them to be already selected.
+  - `selectionOffsetStart = start + 4`
+  - `selectionOffsetEnd = start + 4 + defaultText.length`
+
+We can now:
+
+1. insert the **newText** into the input text area `execInsert(newText, start, end)`;
+2. update the selection: `markdownInput.setSelectionRange(selectionOffsetStart, selectionOffsetEnd)`;
+3. and run **updatePreview()**.
+
 # WORK IN PROGRESS
+
