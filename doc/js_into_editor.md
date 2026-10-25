@@ -14,7 +14,14 @@ const preview = document.getElementById('preview');
 
 function updatePreview() {
   const text = markdownInput.value;
+    
+  // Call to marked "markdown to html" parser
   preview.innerHTML = marked.parse(text);
+
+  // Call to Prism "syntax highlight"
+  if (typeof Prism !== 'undefined') {
+    Prism.highlightAllUnder(preview);
+  }
 }
 
 markdownInput.addEventListener('input', updatePreview);
@@ -39,6 +46,7 @@ updatePreview();
     into *html*.
     **preview.innerHTML**  overwrites the content in the preview area
     with the new html code that has just been generated.
+  - **Prism.highlightAllUnder(preview)**: it's the call to Prism syntax highlight library. The step `typeof Prism !== 'undefined'` makes sure the type Prism exists and it has been correctly loaded. in case of problems Prism will not be called, avoiding to stop the next steps.
 
 - `markdownInput.addEventListener('input', updatePreview)`
 
@@ -304,15 +312,15 @@ function toggleLineSymbol(symbol) {
 
   We start from index `start - 1` which means an index **before our selection**. The method find the first occurrence of the `\n` new line character. But adding **+1** we actually get the first position of our current line.
 
-  > 📝 If it doesn't find any **\n** it will return **-1** but adding adding **+1** we get the beginning of our current line anyway!
+  > 📝 If it doesn't find any **\n** it will return **-1** but adding **+1** we get the beginning of our current line anyway!
 
-- **const selectionEndLineEnd**: this time we simply use the **indexOf()** method: `text.indexOf('\n', end)` which will find (if it exists) the index of next `\n`, otherwise it takes the full text length with the next step:
+- **const selectionEndLineEnd**: this time we simply use the **indexOf()** method: `text.indexOf('\n', end)` which will find (if it exists) the index of next `\n` after our text selection, otherwise it takes the full text length with the next step:
 
   ```js
   if (selectionEndLineEnd === -1) selectionEndLineEnd = text.length;
   ```
 
-  > 📝 We have checked for `\n` around our selection. Inside our selection there could be `\n` symbols and it's fine! Our button will work also on a multi-line selection, from this:
+  > 📝 We have checked for `\n` **around our selection**. Inside our selection there could be `\n` symbols and it's fine! Our button will work also on a multi-line selection, from this:
   >
   > ```
   > bla bla
@@ -327,8 +335,6 @@ function toggleLineSymbol(symbol) {
   > ```
 
 - **fullLinesText**: is the actual text selection `text.substring(selectionStartLineStart, selectionEndLineEnd)`
-
-- **const lines = fullLinesText.split('\n')**: selected text is split into lines.
 
 ## Adding symbols
 
@@ -355,7 +361,7 @@ Selected text will be split in a array of **lines**: `const lines = fullLinesTex
 
 - **isRemoving**: gets a boolean value checking whether the first character of a line is already the symbol we want to add: `lines[0].startsWith(symbol)`.
 
-- **updateLines**: is a new array of lines built via `lines.map()`. Inside it we check the condition **isRemoving** and if a line has already got a symbol, it will be removed and the new array will just have lines without symbol:
+- **updateLines**: is a new array of lines built via `lines.map()`. Inside it we check the condition **isRemoving**. If a line has already got a symbol, it will be removed and the new array will just have lines without symbol:
 
   ```js
   return line.startsWith(symbol) ? line.substring(symbol.length) : line
@@ -367,17 +373,19 @@ Selected text will be split in a array of **lines**: `const lines = fullLinesTex
   return symbol + line
   ```
 
-- **newLinesText**: Finally we join the new formatted lines **updatedLines.join('\n')**.
+- **newLinesText**: Finally we join the new formatted lines `updatedLines.join('\n')`.
 
 ## Inserting the new text
+
+We have got the new block of text **newLinesText**. **execInsert()** will delete the selected text placing the new one. We have then to place the cursor or selection.
 
 ```js
  // PART 3
 
   execInsert(newLinesText, selectionStartLineStart, selectionEndLineEnd);
 
+  // Only cursor case.
   if (start === end) {
-    // Se era solo un cursore singolo (senza selezione), spostalo in modo naturale
     const delta = isRemoving ? -symbol.length : symbol.length;
     const newCursorPos = Math.max(selectionStartLineStart, start + delta);
     markdownInput.setSelectionRange(newCursorPos, newCursorPos);
@@ -388,5 +396,29 @@ Selected text will be split in a array of **lines**: `const lines = fullLinesTex
   updatePreview();
 }
 ```
+
+- **Just a cursor case** (`start === end`): user has not selected text. Let's take as example the symbol '`# `'.
+
+  - **delta**: indicates how many characters the line has shifted. Adding symbol '`# `' the line is now 2 chars longer. Otherwise, if it has been removed it will be 2 chars shorter. This makes clear why **delta** is: `isRemoving ? -symbol.length : symbol.length`
+
+  - **newCursorPos**: we use `Math.max()` which returns the max value of given numbers. Why? Because it could happen that the cursor is right at the beginning of a line and could go in the previous line if **delta** is negative (`start + delta`). The presence of  `selectionStartLineStart` (first position of our line) prevents this situation inside `Math.max(selectionStartLineStart, start + delta)`. 
+
+    `markdownInput.setSelectionRange(newCursorPos, newCursorPos)` set the cursor in the new position. It appears as range (text selection) but *start* and *end* coincide.
+
+    **Example**: with string `ciao` in the beginning position, **cursor** is placed after char `o`. We add '`# `':
+
+    ```
+    012345678
+    ciao|       <-- original situation 
+    # ciao|     <-- new situation
+    ```
+
+    * **start** (cursor position): **4**
+    * **delta**: we are adding so it's **+2** because '`# `' is 2 chars long.
+    *  **newCursorPos**: start + delta = **6**
+
+- **Selection case**: in this case we want the new text to be selected. The argument of **markdownInput.setSelectionRange** will be the the original begin of the line `selectionStartLineStart` and the end will be the beginning of the line plus the length of the new text `selectionStartLineStart + newLinesText.length`.
+
+**updatePreview()** applies the modification updating the html view.
 
 # WORK IN PROGRESS
