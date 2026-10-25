@@ -98,12 +98,13 @@ function toggleLineSymbol(symbol) {
 
   execInsert(newLinesText, selectionStartLineStart, selectionEndLineEnd);
 
+  // Only cursor case.
   if (start === end) {
-    // Se era solo un cursore singolo (senza selezione), spostalo in modo naturale
     const delta = isRemoving ? -symbol.length : symbol.length;
     const newCursorPos = Math.max(selectionStartLineStart, start + delta);
     markdownInput.setSelectionRange(newCursorPos, newCursorPos);
   } else {
+    // Text selection case.
     markdownInput.setSelectionRange(selectionStartLineStart, selectionStartLineStart + newLinesText.length);
   }
 
@@ -142,17 +143,32 @@ function toggleCodeBlock() {
   updatePreview();
 }
 
-// :::::::::::::::::::::: FUNZIONI PER STRUTTURE COMPLESSE
+// :::::::::::::::::::::: NOTE, WARNING...
 
-function insertBlock(template, placeholderLength = 0, offsetFromStart = 0) {
+function insertNote(header, message) {
   markdownInput.focus();
   const start = markdownInput.selectionStart;
   const end = markdownInput.selectionEnd;
+  const text = header + message
   
-  execInsert(template, start, end);
+  execInsert(text, start, end);
   
-  const selectStart = start + offsetFromStart;
-  markdownInput.setSelectionRange(selectStart, selectStart + placeholderLength);
+  const selectStart = start + header.length;
+  markdownInput.setSelectionRange(selectStart, selectStart + message.length);
+  updatePreview();
+}
+
+// :::::::::::::::::::::: EASY INSERT
+// No need for text selection at the end.
+// It's used for tables.
+
+function easyInsert(template) {
+  markdownInput.focus();
+  const start = markdownInput.selectionStart;
+  const end = markdownInput.selectionEnd;
+  const text = template;
+  
+  execInsert(text, start, end);
   updatePreview();
 }
 
@@ -208,20 +224,23 @@ document.getElementById('btn-img').addEventListener('click', () => {
     updatePreview();
 });
 document.getElementById('btn-table').addEventListener('click', () => {
-  const tableTemplate = '\n| Header 1 | Header 2 | Header 3 |\n| :---     | :---:    | ---:     |\n| Cella    | Cella    | Cella    |\n';
-  insertBlock(tableTemplate, 0, tableTemplate.length);
+  const template = '\n| Header 1 | Header 2 | Header 3 |\n| :---     | :---:    | ---:     |\n| Cella    | Cella    | Cella    |\n';
+  easyInsert(template);
 });
 document.getElementById('btn-note').addEventListener('click', () => {
-    const template = '\n> 📝 **Nota**<br>\nScrivi qui la tua nota.\n';
-    insertBlock(template, 23, 19);
+    const header = '\n> 📝 **Nota**<br>\n';
+    const message = 'Scrivi qui la tua nota.\n';
+    insertNote(header, message);
 });
 document.getElementById('btn-tip').addEventListener('click', () => {
-    const template = '\n> 💡 **Suggerimento**<br>\nScrivi qui il tuo suggerimento.\n';
-    insertBlock(template, 31, 27);
+    const header = '\n>💡 **Suggerimento**<br>\n';
+    const message = 'Scrivi qui il tuo suggerimento.\n';
+    insertNote(header, message);
 });
 document.getElementById('btn-warning').addEventListener('click', () => {
-    const template = '\n> ⚠️ **Avviso!**<br>\nScrivi qui il tuo avviso.\n';
-    insertBlock(template, 25, 21);
+    const header = '\n> ⚠️ **Avviso!**<br>\n';
+    const message = 'Scrivi qui il tuo avviso.\n';
+    insertNote(header, message);
 });
 
 // ::::::::::: KEYBOARD SHORTCUTS
