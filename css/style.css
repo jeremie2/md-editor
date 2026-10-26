@@ -59,7 +59,7 @@ a:link, a:visited, a:hover, a:active {
 }
 #markdown-input, #preview {
     flex: 1;
-    background-color: #35353d;
+    background-color: #303038;
     border: 2px solid #d05d19;
     height: 100%;
     border-radius: 10px;
@@ -74,10 +74,10 @@ a:link, a:visited, a:hover, a:active {
     overflow-y: auto;
 }
 pre, code {
-    background-color: #2d2d2d;
+    background-color: #1d1e29;
 }
 pre {
-    border: 1px solid #d05d19;
+    /*! border: 1px solid #d05d19; */
     /*margin-top: 20px;*/
     margin: .5em 0;
     padding: 0.7em;
@@ -101,7 +101,7 @@ pre code {
 }
 td code {
     border: none;
-    background-color: #403c3c;
+    background-color: #363541;
 }
 ul, ol {
     margin-top: 10px;
@@ -111,8 +111,8 @@ li {
     margin-bottom: 20px; 
 }
 table {
-    background-color: #2d2d2d;
-    border: 2px solid #2d2d2d;
+    background-color: #1d1e29;
+    border: 2px solid #1d1e29;
     box-shadow: 0 1px 4px #000;
     margin-top: 15px;
     margin-bottom: 15px;
@@ -136,11 +136,11 @@ button {
     min-width: 45px;
 }
 blockquote {
-    background-color: #292930;
+    background-color: #4a5561;
     border-radius: 10px;
 }
 blockquote p {
-    color: #b0b0b0;
+    color: #d6d6d6;
     margin-top: 15px;
     margin-bottom: 15px;
     padding-top: 10px;
@@ -180,6 +180,26 @@ button.active {
 }
 
 /* ################################### */
+/* ############### TOC ############### */
+/* ################################### */
+
+.toc-h1 { margin-left: 0px; list-style-type: none; }
+.toc-h2 { margin-left: 20px; }
+.toc-h3 { margin-left: 40px; }
+
+.toc-container {
+    width: max-content;
+    background-color: #1d1e29;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 1px 8px #000;
+    font-size: 16px;
+}
+.toc-container a:link a:visited a:hover a:active {
+    text-decoration-thickness: 1px;
+}
+
+/* ################################### */
 /* ########### LIGHT MODE ############ */
 /* ################################### */
 
@@ -189,11 +209,13 @@ button.active {
         color: #333;
     }
     pre {
-        background-color: #f1e8e3;
+        background-color: #fcfcfc;
+        border: 1px solid #fcfcfc;
+        box-shadow: 0 2px 5px #cdcdcd;
     }
     code {
         color: #cb650a;
-        background-color: #f1e8e3;
+        background-color: #fcfcfc;
         border: 1px solid #e1b499;
     }
     pre code {
@@ -204,19 +226,19 @@ button.active {
         background-color: #f1e8e3;
     }
     #preview, #markdown-input {
-        background-color: #f6f5f5;
+        background-color: #f0f0f0;
         color: #333;
     }
     a:link, a:visited, a:hover, a:active {
         color: #000;
     }
     table {
-        background-color: #e3e3e3;
-        border: 2px solid #e3e3e3;
+        background-color: #fcfcfc;
+        border: 2px solid #fcfcfc;
         box-shadow: 0 1px 4px #959595;
     }
     td, th {
-        border: 1pt solid #a4a3a3;
+        border: 1pt solid #d4d4d4;
         padding: 5px;
     }
     button {
@@ -226,6 +248,7 @@ button.active {
     blockquote {
         background-color: #dfecfb;
         color: #333;
+        box-shadow: 0 2px 5px #cdcdcd;
     }
     blockquote p {
         color: #333;
