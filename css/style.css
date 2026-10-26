@@ -186,6 +186,13 @@ button.active {
 .toc-h2 { margin-left: 20px; }
 .toc-h3 { margin-left: 40px; }
 
+.toc-container[open] ol {
+  animation: fadeIn 0.2s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 .toc-container {
     width: max-content;
     background-color: #1d1e29;
@@ -199,7 +206,7 @@ button.active {
     text-decoration-thickness: 1px;
 }
 .toc-container strong {
-    font-size: 30px;
+    font-size: 25px;
 }
 .toc-container li {
     margin-bottom: 5px;
