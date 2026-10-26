@@ -12,6 +12,9 @@ function updatePreview() {
   const text = markdownInput.value;
   preview.innerHTML = marked.parse(text);
 
+  // Genera il menu dinamico inserendo i link ai titoli
+  generateTableOfContents(preview);
+
   // Prism syntax highlight
   if (typeof Prism !== 'undefined') {
     Prism.highlightAllUnder(preview);
@@ -297,4 +300,84 @@ function changeView(viewClass, activeButton) {
 btnSplit.addEventListener('click', () => changeView('split-view', btnSplit));
 btnInput.addEventListener('click', () => changeView('only-input', btnInput));
 btnPreview.addEventListener('click', () => changeView('only-preview', btnPreview));
- 
+
+ // :::::::::::::::::::::: TOC
+
+function generateTableOfContents(previewArea) {
+  const currentHtml = previewArea.innerHTML;
+  let foundPlaceholder = "";
+  let maxLevel = 3;
+
+  if (currentHtml.includes('[TOC-3]')) {
+    foundPlaceholder = '[TOC-3]';
+    maxLevel = 3;
+  } else if (currentHtml.includes('[TOC-2]')) {
+    foundPlaceholder = '[TOC-2]';
+    maxLevel = 2;
+  } else if (currentHtml.includes('[TOC]')) {
+    foundPlaceholder = '[TOC]';
+    maxLevel = 1;
+  }
+
+  if (!foundPlaceholder) return;
+
+  let selectors = [];
+  for (let i = 1; i <= maxLevel; i++) {
+    selectors.push('h' + i);
+  }
+  const selectorsString = selectors.join(', ');
+
+  const headings = previewArea.querySelectorAll(selectorsString);
+  if (headings.length === 0) return;
+
+  // 1. Inizializziamo l'albero HTML usando tag <ol> per la numerazione nativa
+  let tocHtml = '<div class="toc-container"><strong>Indice</strong><ol>';
+  let currentLevel = 1;
+
+  headings.forEach((heading, index) => {
+    const uniqueId = 'heading-paragraph-' + index;
+    heading.id = uniqueId;
+
+    // Estraiamo il numero dal tag (es: "h2" diventa il numero 2)
+    const level = parseInt(heading.tagName.substring(1));
+
+    // Se scendiamo di livello (es. da h1 a h2), apriamo una nuova sotto-lista numerata
+    if (level > currentLevel) {
+      while (level > currentLevel) {
+        tocHtml += '<ol>';
+        currentLevel++;
+      }
+    } 
+    // Se saliamo di livello (es. da h3 a h1), chiudiamo le sotto-liste aperte
+    else if (level < currentLevel) {
+      while (level < currentLevel) {
+        tocHtml += '</ol></li>';
+        currentLevel--;
+      }
+    } 
+    // Se siamo allo stesso livello del titolo precedente, chiudiamo il tag del punto precedente
+    else if (index > 0) {
+      tocHtml += '</li>';
+    }
+
+    // Aggiungiamo la singola voce dell'elenco
+    tocHtml += `<li><a href="#${uniqueId}">${heading.innerText}</a>`;
+  });
+
+  // Chiudiamo tutte le liste rimaste aperte alla fine del ciclo
+  while (currentLevel > 0) {
+    tocHtml += '</ol>';
+    if (currentLevel > 1) tocHtml += '</li>';
+    currentLevel--;
+  }
+  
+  tocHtml += '</div>';
+
+  const freshHtml = previewArea.innerHTML;
+
+  if (freshHtml.includes(`<p>${foundPlaceholder}</p>`)) {
+    previewArea.innerHTML = freshHtml.replace(`<p>${foundPlaceholder}</p>`, tocHtml);
+  } else {
+    previewArea.innerHTML = freshHtml.replace(foundPlaceholder, tocHtml);
+  }
+}
