@@ -331,7 +331,7 @@ function generateTableOfContents(previewArea) {
   if (headings.length === 0) return;
 
   // 1. Inizializziamo l'albero HTML usando tag <ol> per la numerazione nativa
-  let tocHtml = '<div class="toc-container"><strong>Indice</strong><ol>';
+  let tocHtml = '<div class="toc-container"><strong>☰ Indice</strong><ol>';
   let currentLevel = 1;
 
   headings.forEach((heading, index) => {
