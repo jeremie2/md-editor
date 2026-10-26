@@ -230,6 +230,18 @@ document.getElementById('btn-table').addEventListener('click', () => {
   const template = '\n| Header 1 | Header 2 | Header 3 |\n| :---     | :---:    | ---:     |\n| Cella    | Cella    | Cella    |\n';
   easyInsert(template);
 });
+document.getElementById('btn-menu-1').addEventListener('click', () => {
+  const template = '[TOC]\n';
+  easyInsert(template);
+});
+document.getElementById('btn-menu-2').addEventListener('click', () => {
+  const template = '[TOC-2]\n';
+  easyInsert(template);
+});
+document.getElementById('btn-menu-3').addEventListener('click', () => {
+  const template = '[TOC-3]\n';
+  easyInsert(template);
+});
 document.getElementById('btn-note').addEventListener('click', () => {
     const header = '\n> 📝 **Nota**<br>\n';
     const message = 'Scrivi qui la tua nota.\n';
