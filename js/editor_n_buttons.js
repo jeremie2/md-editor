@@ -331,7 +331,7 @@ function generateTableOfContents(previewArea) {
   if (headings.length === 0) return;
 
   // 1. Inizializziamo l'albero HTML usando tag <ol> per la numerazione nativa
-  let tocHtml = '<div class="toc-container"><strong>☰ Indice</strong><ol>';
+  let tocHtml = '<details class="toc-container"><summary style="cursor:pointer; user-select:none;"><strong>Indice</strong></summary><ol>';
   let currentLevel = 1;
 
   headings.forEach((heading, index) => {
@@ -371,7 +371,7 @@ function generateTableOfContents(previewArea) {
     currentLevel--;
   }
   
-  tocHtml += '</div>';
+  tocHtml += '</details>';
 
   const freshHtml = previewArea.innerHTML;
 
@@ -379,5 +379,14 @@ function generateTableOfContents(previewArea) {
     previewArea.innerHTML = freshHtml.replace(`<p>${foundPlaceholder}</p>`, tocHtml);
   } else {
     previewArea.innerHTML = freshHtml.replace(foundPlaceholder, tocHtml);
+  }
+
+  const detailsEl = previewArea.querySelector('.toc-container');
+  if (detailsEl) {
+    detailsEl.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        detailsEl.open = false; // Chiude l'indice al clic su un link
+      });
+    });
   }
 }
