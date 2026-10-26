@@ -46,7 +46,7 @@ h1, h2, h3 {
 p {
     line-height: 1.5;
 }
-a:link, a:visited, a:hover, a:active {
+a {
     color: #fff;
     text-decoration: underline;
     text-decoration-color: #ff9c61;
@@ -78,7 +78,6 @@ pre, code {
 }
 pre {
     /*! border: 1px solid #d05d19; */
-    /*margin-top: 20px;*/
     margin: .5em 0;
     padding: 0.7em;
     border-radius: 10px;
@@ -195,8 +194,15 @@ button.active {
     box-shadow: 0 1px 8px #000;
     font-size: 16px;
 }
-.toc-container a:link a:visited a:hover a:active {
+.toc-container a {
+    font-size: 16px;
     text-decoration-thickness: 1px;
+}
+.toc-container strong {
+    font-size: 30px;
+}
+.toc-container li {
+    margin-bottom: 5px;
 }
 
 /* ################################### */
@@ -252,5 +258,12 @@ button.active {
     }
     blockquote p {
         color: #333;
+    }
+    .toc-container {
+        background-color: #fcfcfc;
+        box-shadow: 0 1px 8px #cdcdcd;
+    }
+    .toc-container a {
+        color: #2e2e2e;
     }
 }
