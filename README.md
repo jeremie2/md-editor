@@ -23,6 +23,8 @@ While writing into the left edit area, you will immediately see the result into 
     ![dark](img/md_dark.png)
   - Light:
     ![light](img/md_light.png) 
+- Integrated index available:
+  ![Index](img/index.png)
 
 # More details
 
