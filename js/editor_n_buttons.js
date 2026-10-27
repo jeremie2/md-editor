@@ -14,6 +14,9 @@ function updatePreview() {
 
   // Genera il menu dinamico inserendo i link ai titoli
   generateTableOfContents(preview);
+  
+  // Check Ubuntu version.
+  parseUbuntuVersions(preview);
 
   // Prism syntax highlight
   if (typeof Prism !== 'undefined') {
@@ -230,16 +233,20 @@ document.getElementById('btn-table').addEventListener('click', () => {
   const template = '\n| Header 1 | Header 2 | Header 3 |\n| :---     | :---:    | ---:     |\n| Cella    | Cella    | Cella    |\n';
   easyInsert(template);
 });
+document.getElementById('btn-ubu-version').addEventListener('click', () => {
+  const template = '\n[UBU ]\n';
+  easyInsert(template);
+});
 document.getElementById('btn-menu-1').addEventListener('click', () => {
-  const template = '[TOC]\n';
+  const template = '[IND]\n';
   easyInsert(template);
 });
 document.getElementById('btn-menu-2').addEventListener('click', () => {
-  const template = '[TOC-2]\n';
+  const template = '[IND-2]\n';
   easyInsert(template);
 });
 document.getElementById('btn-menu-3').addEventListener('click', () => {
-  const template = '[TOC-3]\n';
+  const template = '[IND-3]\n';
   easyInsert(template);
 });
 document.getElementById('btn-note').addEventListener('click', () => {
@@ -320,14 +327,14 @@ function generateTableOfContents(previewArea) {
   let foundPlaceholder = "";
   let maxLevel = 3;
 
-  if (currentHtml.includes('[TOC-3]')) {
-    foundPlaceholder = '[TOC-3]';
+  if (currentHtml.includes('[IND-3]')) {
+    foundPlaceholder = '[IND-3]';
     maxLevel = 3;
-  } else if (currentHtml.includes('[TOC-2]')) {
-    foundPlaceholder = '[TOC-2]';
+  } else if (currentHtml.includes('[IND-2]')) {
+    foundPlaceholder = '[IND-2]';
     maxLevel = 2;
-  } else if (currentHtml.includes('[TOC]')) {
-    foundPlaceholder = '[TOC]';
+  } else if (currentHtml.includes('[IND]')) {
+    foundPlaceholder = '[IND]';
     maxLevel = 1;
   }
 
@@ -400,5 +407,88 @@ function generateTableOfContents(previewArea) {
         detailsEl.open = false; // Chiude l'indice al clic su un link
       });
     });
+  }
+}
+
+// :::::::::::::::::::::: UBU VERSIONS
+
+function parseUbuntuVersions(previewArea) {
+  const currentHtml = previewArea.innerHTML;
+  
+  // Regex per intercettare il tag [UBU XY.ZW AB.CD ...]
+  const versionRegex = /\[UBU\s+([^\]]+)\]/gi;
+  const match = versionRegex.exec(currentHtml);
+  
+  if (!match) return; // Se il tag non c'è, esce subito
+  
+  const fullTag = match[0]; // Es: "[UBU 24.04 26.10]"
+  const versionsString = match[1]; // Es: "24.04 26.10"
+  const versions = versionsString.trim().split(/\s+/); // Array delle versioni inserite
+  
+  // Data corrente (Siamo nel 2026)
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1; // Gennaio è 0, quindi facciamo +1
+  
+  let maxStatus = 0; // 0 = Obsoleto, 1 = Solo Pro, 2 = Supporto Standard Attivo
+  
+  // Analizziamo lo stato di ogni versione inserita nel tag
+  versions.forEach(ver => {
+    const parts = ver.split('.');
+    if (parts.length !== 2) return;
+    
+    const releaseYear = parseInt("20" + parts[0]); // Es: "24" -> 2024
+    const releaseMonth = parseInt(parts[1]);      // Es: "04" -> 4
+    
+    // Controlliamo se è una release LTS (rilasciate ad Aprile degli anni pari)
+    const isLTS = (releaseMonth === 4 && releaseYear % 2 === 0);
+    
+    // Calcoliamo la fine del supporto standard e del supporto Pro (in mesi totali)
+    const releaseTotalMonths = (releaseYear * 12) + releaseMonth;
+    const currentTotalMonths = (currentYear * 12) + currentMonth;
+    
+    const standardSupportDuration = isLTS ? (5 * 12) : 9; // 5 anni (LTS) o 9 mesi (intermedie)
+    const proSupportDuration = isLTS ? (10 * 12) : 9;     // Altri 5 anni (totale 10) solo per LTS
+    
+    const endStandardMonths = releaseTotalMonths + standardSupportDuration;
+    const endProMonths = releaseTotalMonths + proSupportDuration;
+    
+    // Determina lo stato della singola versione analizzata
+    if (currentTotalMonths <= endStandardMonths) {
+      if (maxStatus < 2) maxStatus = 2; // Almeno una versione è in pieno supporto standard
+    } else if (isLTS && currentTotalMonths <= endProMonths) {
+      if (maxStatus < 1) maxStatus = 1; // Almeno una è fuori supporto standard ma in Ubuntu Pro
+    }
+    // Se non entra nei due blocchi sopra, la versione è considerata obsoleta (rimane maxStatus = 0)
+  });
+  
+  // Generiamo il box di avviso HTML in base al livello di supporto trovato
+  let alertBoxHtml = '';
+  const contribLink = ' <a href="#contribuisci" class="btn-contrib">Clicca qui!</a>';
+  
+  if (maxStatus === 2) {
+    // Caso 1: C'è almeno una versione con supporto standard attivo
+    alertBoxHtml = `<div class="ubuntu-alert alert-active">
+      <strong>Guida verificata con Ubuntu</strong><br>${versions.join(', ')}
+    </div>`;
+  } else if (maxStatus === 1) {
+    // Caso 2: Le versioni standard sono scadute, ma almeno una è ancora coperta da Ubuntu Pro
+    alertBoxHtml = `<div class="ubuntu-alert alert-pro">
+      ⚠️ <strong>Guida non verificata da molto tempo.</strong> Può contenere informazioni utili per la versione Ubuntu Pro ${versionsString}. Vuoi contribuire ad aggiornarla?${contribLink}
+    </div>`;
+  } else {
+    // Caso 3: Tutte le versioni indicate nel tag sono totalmente fuori supporto (obsolete)
+    alertBoxHtml = `<div class="ubuntu-alert alert-obsolete">
+      🛑 <strong>Guida verificata con versioni obsolete di Ubuntu</strong>, potrebbe non essere più valida. Vuoi contribuire ad aggiornarla?${contribLink}
+    </div>`;
+  }
+  
+  // Sostituiamo il tag [UBU ...] con il box HTML generato
+  // Gestisce sia il caso in cui marked lo abbia avvolto in un paragrafo, sia il tag isolato
+  const freshHtml = previewArea.innerHTML;
+  if (freshHtml.includes(`<p>${fullTag}</p>`)) {
+    previewArea.innerHTML = freshHtml.replace(`<p>${fullTag}</p>`, alertBoxHtml);
+  } else {
+    previewArea.innerHTML = freshHtml.replace(fullTag, alertBoxHtml);
   }
 }
