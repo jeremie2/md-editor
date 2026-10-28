@@ -410,85 +410,181 @@ function generateTableOfContents(previewArea) {
   }
 }
 
-// :::::::::::::::::::::: UBU VERSIONS
+// ::::::::::::::::::::::::::::::::::::::
+// :::::::::::::::::::::: UBU VERSIONS ::
+// ::::::::::::::::::::::::::::::::::::::
+
+// :::::::::::::: Constant templates
+
+const CONTRIB_LINK = ' <a href="#contribuisci" class="btn-contrib">Clicca qui!</a>';
+
+const ALERT_TEMPLATES = {
+    error: (version) => `
+        <div class="ubuntu-alert alert-error">
+            🛑 <strong>Errore nel tag UBU:</strong> La versione di Ubuntu "<strong>${version}</strong>" non esiste. Per favore, verificare i dati inseriti.
+        </div>`,
+    
+    active: (versionsList) => `
+        <div class="ubuntu-alert alert-active">
+            <strong>Guida verificata con Ubuntu</strong><br>${versionsList}
+        </div>`,
+    
+    pro: (versionsString) => `
+        <div class="ubuntu-alert alert-pro">
+            ⚠️ <strong>Guida non verificata da molto tempo.</strong> Può contenere informazioni utili per la versione Ubuntu Pro ${versionsString}. Vuoi contribuire ad aggiornarla?${CONTRIB_LINK}
+        </div>`,
+    
+    obsolete: () => `
+        <div class="ubuntu-alert alert-obsolete">
+            🛑 <strong>Guida verificata con versioni obsolete di Ubuntu</strong>, potrebbe non essere più valida. Vuoi contribuire ad aggiornarla?${CONTRIB_LINK}
+        </div>`
+};
+
+// :::::::::::::: helper functions
+
+// Update set list of Ubuntu versions.
+function generaSetVersioniUbuntu() {
+    const releases = [
+        '6.06',  '6.10',  '7.04',  '7.10',  '8.04',  '8.10',
+        '9.04',  '9.10',  '12.04', '12.10', '13.04', '13.10',
+        '14.04', '14.10', '15.04', '15.10', '10.04', '10.10',
+        '11.04', '11.10', '16.04', '16.10', '17.04', '17.10',
+        '18.04', '18.10', '19.04', '19.10', '20.04', '20.10',
+        '21.04', '21.10', '22.04', '22.10', '23.04', '23.10',
+        '24.04', '24.10', '25.04', '25.10'
+    ];
+
+    const currentYear = new Date().getFullYear();
+    const lastTwoCorrectDigits = currentYear % 100;  // E.g.: 2026 -> 26
+    // From last year element in `releases` it gets the year:
+    // '25.10' -> 25 as int
+    const lastElementYear = parseInt(releases.at(-1).split('.')[0], 10);
+    // 3. Generiamo i rilasci standard dal 2016 (anno 16) in poi
+    for (let year = lastElementYear; year + 1 <= lastTwoCorrectDigits; year++) {
+        
+        // `.04` always released in the first half of the year.
+        if (year < lastTwoCorrectDigits || (year === lastTwoCorrectDigits && new Date().getMonth() >= 3)) {
+            releases.push(`${year}.04`);
+        }
+
+        // `.10` it is added only if the year has passed or if
+        // we are already in October or later (month >= 9 in JS)
+        if (year < lastTwoCorrectDigits || (year === lastTwoCorrectDigits && new Date().getMonth() >= 9)) {
+            releases.push(`${year}.10`);
+        }
+    }
+
+    return new Set(releases);
+}
+
+function validateVersions(versionsArray, validVersionsSet) {
+    let invalidVersion = null;
+
+    for (const ver of versionsArray) {
+        if (!ver) continue;
+        // Se la versione non esiste nel Set ufficiale, cattura l'errore
+        if (!validVersionsSet.has(ver)) {
+            invalidVersion = ver;
+            break;
+        }
+    }
+
+    return {
+        isValid: invalidVersion === null,
+        invalidVersion: invalidVersion
+    };
+}
+
+function getHighestSupportStatus(versionsArray) {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1; // Gennaio è 0 -> +1
+    const currentTotalMonths = (currentYear * 12) + currentMonth;
+
+    let maxStatus = 0;
+
+    versionsArray.forEach(ver => {
+        if (!ver) return;
+        const parts = ver.split('.');
+        if (parts.length !== 2) return;
+
+        const releaseYear = parseInt("20" + parts[0], 10);
+        const releaseMonth = parseInt(parts[1], 10);
+
+        // Controllo se è LTS (Aprile degli anni pari)
+        const isLTS = (releaseMonth === 4 && releaseYear % 2 === 0);
+
+        const releaseTotalMonths = (releaseYear * 12) + releaseMonth;
+        const standardSupportDuration = isLTS ? (5 * 12) : 9;
+        const proSupportDuration = isLTS ? (10 * 12) : 9;
+
+        const endStandardMonths = releaseTotalMonths + standardSupportDuration;
+        const endProMonths = releaseTotalMonths + proSupportDuration;
+
+        if (currentTotalMonths <= endStandardMonths) {
+            if (maxStatus < 2) maxStatus = 2;
+        } else if (isLTS && currentTotalMonths <= endProMonths) {
+            if (maxStatus < 1) maxStatus = 1;
+        }
+    });
+
+    return maxStatus;
+}
+
+// :::::::::::::: main function
 
 function parseUbuntuVersions(previewArea) {
   const currentHtml = previewArea.innerHTML;
   
-  // Regex per intercettare il tag [UBU XY.ZW AB.CD ...]
+  // Intercept tag [UBU XY.ZW AB.CD ...]
   const versionRegex = /\[UBU\s+([^\]]+)\]/gi;
+
+  // `exec()` searches the given pattern (versionRegex)
+  // into `currentHtml`. It returns `null` id it doesn't find it.
+  // Otherwise it returns an array where:
+  // match[0]: the whole tag like [UBU 24.04 24.10].
+  // match[0]: text inside [UBU ] like "24.04 24.10".
   const match = versionRegex.exec(currentHtml);
   
-  if (!match) return; // Se il tag non c'è, esce subito
+  if (!match) return; // Exit if there is NO tag.
   
-  const fullTag = match[0]; // Es: "[UBU 24.04 26.10]"
-  const versionsString = match[1]; // Es: "24.04 26.10"
-  const versions = versionsString.trim().split(/\s+/); // Array delle versioni inserite
+  const fullTag = match[0];        // E.g. "[UBU 24.04 26.10]"
+  const versionsString = match[1]; // E.g. "24.04 26.10"
+  // Ubu versions array which needs to be checked.
+  const versions = versionsString.trim().split(/\s+/);
   
-  // Data corrente (Siamo nel 2026)
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1; // Gennaio è 0, quindi facciamo +1
+  // :::::::::::::::::::::::: ok till here
   
-  let maxStatus = 0; // 0 = Obsoleto, 1 = Solo Pro, 2 = Supporto Standard Attivo
+  // 2. Generazione del Set ufficiale di controllo
+  const validUbuntuVersions = generaSetVersioniUbuntu();
   
-  // Analizziamo lo stato di ogni versione inserita nel tag
-  versions.forEach(ver => {
-    const parts = ver.split('.');
-    if (parts.length !== 2) return;
-    
-    const releaseYear = parseInt("20" + parts[0]); // Es: "24" -> 2024
-    const releaseMonth = parseInt(parts[1]);      // Es: "04" -> 4
-    
-    // Controlliamo se è una release LTS (rilasciate ad Aprile degli anni pari)
-    const isLTS = (releaseMonth === 4 && releaseYear % 2 === 0);
-    
-    // Calcoliamo la fine del supporto standard e del supporto Pro (in mesi totali)
-    const releaseTotalMonths = (releaseYear * 12) + releaseMonth;
-    const currentTotalMonths = (currentYear * 12) + currentMonth;
-    
-    const standardSupportDuration = isLTS ? (5 * 12) : 9; // 5 anni (LTS) o 9 mesi (intermedie)
-    const proSupportDuration = isLTS ? (10 * 12) : 9;     // Altri 5 anni (totale 10) solo per LTS
-    
-    const endStandardMonths = releaseTotalMonths + standardSupportDuration;
-    const endProMonths = releaseTotalMonths + proSupportDuration;
-    
-    // Determina lo stato della singola versione analizzata
-    if (currentTotalMonths <= endStandardMonths) {
-      if (maxStatus < 2) maxStatus = 2; // Almeno una versione è in pieno supporto standard
-    } else if (isLTS && currentTotalMonths <= endProMonths) {
-      if (maxStatus < 1) maxStatus = 1; // Almeno una è fuori supporto standard ma in Ubuntu Pro
-    }
-    // Se non entra nei due blocchi sopra, la versione è considerata obsoleta (rimane maxStatus = 0)
-  });
+  // 3. PROCESSO DI VALIDAZIONE
+  const validation = validateVersions(versions, validUbuntuVersions);
   
-  // Generiamo il box di avviso HTML in base al livello di supporto trovato
   let alertBoxHtml = '';
-  const contribLink = ' <a href="#contribuisci" class="btn-contrib">Clicca qui!</a>';
-  
-  if (maxStatus === 2) {
-    // Caso 1: C'è almeno una versione con supporto standard attivo
-    alertBoxHtml = `<div class="ubuntu-alert alert-active">
-      <strong>Guida verificata con Ubuntu</strong><br>${versions.join(', ')}
-    </div>`;
-  } else if (maxStatus === 1) {
-    // Caso 2: Le versioni standard sono scadute, ma almeno una è ancora coperta da Ubuntu Pro
-    alertBoxHtml = `<div class="ubuntu-alert alert-pro">
-      ⚠️ <strong>Guida non verificata da molto tempo.</strong> Può contenere informazioni utili per la versione Ubuntu Pro ${versionsString}. Vuoi contribuire ad aggiornarla?${contribLink}
-    </div>`;
+
+  if (!validation.isValid) {
+      // Se non è valida, usa il template di errore
+      alertBoxHtml = ALERT_TEMPLATES.error(validation.invalidVersion);
   } else {
-    // Caso 3: Tutte le versioni indicate nel tag sono totalmente fuori supporto (obsolete)
-    alertBoxHtml = `<div class="ubuntu-alert alert-obsolete">
-      🛑 <strong>Guida verificata con versioni obsolete di Ubuntu</strong>, potrebbe non essere più valida. Vuoi contribuire ad aggiornarla?${contribLink}
-    </div>`;
+      // 4. DEDUZIONE DEL SUPPORTO STANDARD / PRO
+      const maxStatus = getHighestSupportStatus(versions);
+      
+      // 5. SELEZIONE DEL TEMPLATE IN BASE ALLO STATO
+      if (maxStatus === 2) {
+          alertBoxHtml = ALERT_TEMPLATES.active(versions.join(', '));
+      } else if (maxStatus === 1) {
+          alertBoxHtml = ALERT_TEMPLATES.pro(versionsString);
+      } else {
+          alertBoxHtml = ALERT_TEMPLATES.obsolete();
+      }
   }
   
-  // Sostituiamo il tag [UBU ...] con il box HTML generato
-  // Gestisce sia il caso in cui marked lo abbia avvolto in un paragrafo, sia il tag isolato
+  // 6. Iniezione finale nel DOM
   const freshHtml = previewArea.innerHTML;
   if (freshHtml.includes(`<p>${fullTag}</p>`)) {
-    previewArea.innerHTML = freshHtml.replace(`<p>${fullTag}</p>`, alertBoxHtml);
+      previewArea.innerHTML = freshHtml.replace(`<p>${fullTag}</p>`, alertBoxHtml);
   } else {
-    previewArea.innerHTML = freshHtml.replace(fullTag, alertBoxHtml);
+      previewArea.innerHTML = freshHtml.replace(fullTag, alertBoxHtml);
   }
 }
