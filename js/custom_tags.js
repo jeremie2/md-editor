@@ -14,7 +14,7 @@ const ALERT_TEMPLATES = {
     
     active: (versionsList) => `
         <div class="ubuntu-alert alert-active">
-            <strong>Guida valida per Ubuntu:</strong> ${versionsList}
+            Guida testata con Ubuntu: <strong>${versionsList}</strong>
         </div>`,
     
     pro: (versionsString) => `
@@ -29,7 +29,7 @@ const ALERT_TEMPLATES = {
 
     forumLink: (url) => `
         <div class="link-forum-box">
-            Problemi? Segnala in <a href="${url}">questa discussione</a>.
+            Problemi nella pagina? Segnala <a href="${url}">qui</a>.
         </div>`,
         
     forumError: () => `
