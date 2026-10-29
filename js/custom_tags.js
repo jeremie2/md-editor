@@ -228,6 +228,12 @@ function getHighestSupportStatus(versionsArray) {
     // maxStatus = 1 -> pro 10 years support range.
     // maxStatus = 0 -> obsolete. (Legacy Support is out of our goals)
     let maxStatus = 0;
+    // Map with state of every specific version.
+
+    // We take note of every status for ALERT_TEMPLATES:
+    // .active() shows only standard support version
+    // .pro() shows only pro support version
+    const detailedStatuses = {};
 
     versionsArray.forEach(ver => {
         if (!ver) return;
@@ -253,18 +259,23 @@ function getHighestSupportStatus(versionsArray) {
         const endStandardMonths = releaseTotalMonths + standardSupportDuration;
         // 24.04 end of pro support after 24.292 + 120 = 24.412 months
         const endProMonths = releaseTotalMonths + proSupportDuration;
+        
+        let currentVerStatus = 0;
 
         // If months <= endStandardMonths → maxStatus = 2 (Active Standard Support).
         // If endStandardMonths <= months <=  endProMonths → maxStatus = 1 (Pro Support).
         // Else maxStatus = 0 (Obsolete).
-        if (currentTotalMonths <= endStandardMonths) {
+        if (currentTotalMonths <= endStandardMonths) {currentVerStatus = 2;
             if (maxStatus < 2) maxStatus = 2;
         } else if (isLTS && currentTotalMonths <= endProMonths) {
+            currentVerStatus = 1;
             if (maxStatus < 1) maxStatus = 1;
         }
+
+        detailedStatuses[ver] = currentVerStatus;
     });
 
-    return maxStatus;
+    return { maxStatus, detailedStatuses };
 }
 
 // :::::::::::::: main function
@@ -305,13 +316,21 @@ function parseUbuntuVersions(previewArea) {
       alertBoxHtml = ALERT_TEMPLATES.error(validation.invalidVersion);
   } else {
       // Which kind of support (standard/pro).
-      const maxStatus = getHighestSupportStatus(versions);
+      const { maxStatus, detailedStatuses } = getHighestSupportStatus(versions);
       
       // Which kind of template based on kind of support.
       if (maxStatus === 2) {
-          alertBoxHtml = ALERT_TEMPLATES.active(versions.join(', '));
+          // Only active version will be shown.
+          const activeVersions = versions
+            .filter(ver => detailedStatuses[ver] === 2)
+            .sort();
+          alertBoxHtml = ALERT_TEMPLATES.active(activeVersions.join(' '));
       } else if (maxStatus === 1) {
-          alertBoxHtml = ALERT_TEMPLATES.pro(versionsString);
+          // Only pro version will be shown.
+          const proVersions = versions
+            .filter(ver => detailedStatuses[ver] === 1)
+            .sort();
+          alertBoxHtml = ALERT_TEMPLATES.pro(proVersions.join(', '));
       } else {
           alertBoxHtml = ALERT_TEMPLATES.obsolete();
       }
