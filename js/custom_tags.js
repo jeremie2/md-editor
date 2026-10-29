@@ -255,8 +255,8 @@ function getHighestSupportStatus(versionsArray) {
         const endProMonths = releaseTotalMonths + proSupportDuration;
 
         // If months <= endStandardMonths → maxStatus = 2 (Active Standard Support).
-        // Se lo standard è scaduto, ma siamo ancora dentro la scadenza Pro → Voto 1 (Solo Ubuntu Pro).
-        // Altrimenti → Rimane Voto 0 (Obsoleto).
+        // If endStandardMonths <= months <=  endProMonths → maxStatus = 1 (Pro Support).
+        // Else maxStatus = 0 (Obsolete).
         if (currentTotalMonths <= endStandardMonths) {
             if (maxStatus < 2) maxStatus = 2;
         } else if (isLTS && currentTotalMonths <= endProMonths) {
