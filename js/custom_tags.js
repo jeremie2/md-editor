@@ -2,6 +2,42 @@
 // ::::::::::::::::::::::: CUSTOM TAGS ::
 // ::::::::::::::::::::::::::::::::::::::
 
+// :::::::::::::: Constant templates
+
+const CONTRIB_LINK = ' <a href="#contribuisci" class="btn-contrib">Clicca qui!</a>';
+
+const ALERT_TEMPLATES = {
+    error: (version) => `
+        <div class="ubuntu-alert alert-error">
+            🛑 <strong>Errore nel tag UBU:</strong> la versione di Ubuntu "<strong>${version}</strong>" non esiste. Per favore, verificare i dati inseriti.
+        </div>`,
+    
+    active: (versionsList) => `
+        <div class="ubuntu-alert alert-active">
+            <strong>Guida valida per Ubuntu:</strong> ${versionsList}
+        </div>`,
+    
+    pro: (versionsString) => `
+        <div class="ubuntu-alert alert-pro">
+            ⚠️ <strong>Guida non verificata da molto tempo.</strong> Può contenere informazioni utili per versioni Ubuntu Pro: ${versionsString}. Vuoi contribuire ad aggiornarla?${CONTRIB_LINK}
+        </div>`,
+    
+    obsolete: () => `
+        <div class="ubuntu-alert alert-obsolete">
+            🛑 <strong>Guida verificata con versioni obsolete di Ubuntu</strong>, potrebbe non essere più valida. Vuoi contribuire ad aggiornarla?${CONTRIB_LINK}
+        </div>`,
+
+    forumLink: (url) => `
+        <div class="link-forum-box">
+            Problemi? Segnala in <a href="${url}">questa discussione</a>.
+        </div>`,
+        
+    forumError: () => `
+        <div class="ubuntu-alert alert-error">
+            🛑 <strong>Errore nel tag FORUM:</strong> L'URL inserito non sembra essere un link valido al forum di Ubuntu.
+        </div>`      
+};
+
 /// :::::::::::::::::::::: HELPER FUNCTION "IS TAG"
 
 /**
@@ -34,7 +70,9 @@ function isTagInsideCode(tagText, container) {
     return false; // Safe tag, it can be rendered.
 }
 
- // :::::::::::::::::::::: TOC
+// ::::::::::::::::::::::::::::::::::::::
+// :::::::::::::::::::::: TOC :::::::::::
+// ::::::::::::::::::::::::::::::::::::::
 
 function generateTableOfContents(previewArea) {
   const currentHtml = previewArea.innerHTML;
@@ -133,32 +171,6 @@ function generateTableOfContents(previewArea) {
 // ::::::::::::::::::::::::::::::::::::::
 // :::::::::::::::::::::: UBU VERSIONS ::
 // ::::::::::::::::::::::::::::::::::::::
-
-// :::::::::::::: Constant templates
-
-const CONTRIB_LINK = ' <a href="#contribuisci" class="btn-contrib">Clicca qui!</a>';
-
-const ALERT_TEMPLATES = {
-    error: (version) => `
-        <div class="ubuntu-alert alert-error">
-            🛑 <strong>Errore nel tag UBU:</strong> La versione di Ubuntu "<strong>${version}</strong>" non esiste. Per favore, verificare i dati inseriti.
-        </div>`,
-    
-    active: (versionsList) => `
-        <div class="ubuntu-alert alert-active">
-            <strong>Guida verificata con Ubuntu</strong><br>${versionsList}
-        </div>`,
-    
-    pro: (versionsString) => `
-        <div class="ubuntu-alert alert-pro">
-            ⚠️ <strong>Guida non verificata da molto tempo.</strong> Può contenere informazioni utili per versioni Ubuntu Pro: ${versionsString}. Vuoi contribuire ad aggiornarla?${CONTRIB_LINK}
-        </div>`,
-    
-    obsolete: () => `
-        <div class="ubuntu-alert alert-obsolete">
-            🛑 <strong>Guida verificata con versioni obsolete di Ubuntu</strong>, potrebbe non essere più valida. Vuoi contribuire ad aggiornarla?${CONTRIB_LINK}
-        </div>`
-};
 
 // :::::::::::::: helper functions
 
@@ -341,5 +353,50 @@ function parseUbuntuVersions(previewArea) {
       previewArea.innerHTML = freshHtml.replace(`<p>${fullTag}</p>`, alertBoxHtml);
   } else {
       previewArea.innerHTML = freshHtml.replace(fullTag, alertBoxHtml);
+  }
+}
+
+// ::::::::::::::::::::::::::::::::::::::
+// ::::::::::::::::::::: LINK TO FORUM ::
+// ::::::::::::::::::::::::::::::::::::::
+
+function parseForumTag(previewArea) {
+  const currentHtml = previewArea.innerHTML;
+  // Intercepts tag FORUM.
+  const forumRegex = /\[FORUM\s+([^\]]+)\]/gi;
+  const match = forumRegex.exec(currentHtml);
+  
+  if (!match) return; // Exit if there's no tag.
+  
+  const fullTag = match[0];
+  let insideContent = match[1].trim();
+  
+  if (isTagInsideCode(fullTag, previewArea)) return;
+  
+  if (insideContent.includes('<a ')) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = insideContent;
+    const anchor = tempDiv.querySelector('a');
+    if (anchor) {
+      insideContent = anchor.getAttribute('href').trim();
+    }
+  }
+  
+  let alertBoxHtml = '';
+  
+  // Link validation.
+  if (insideContent.startsWith('http://') || insideContent.startsWith('https://') || insideContent.startsWith('www.')) {
+    const finalUrl = insideContent.startsWith('www.') ? `https://${insideContent}` : insideContent;
+    alertBoxHtml = ALERT_TEMPLATES.forumLink(finalUrl);
+  } else {
+    alertBoxHtml = ALERT_TEMPLATES.forumError();
+  }
+  
+  // Sobstitution into preview.
+  const freshHtml = previewArea.innerHTML;
+  if (freshHtml.includes(`<p>${fullTag}</p>`)) {
+    previewArea.innerHTML = freshHtml.replace(`<p>${fullTag}</p>`, alertBoxHtml);
+  } else {
+    previewArea.innerHTML = freshHtml.replace(fullTag, alertBoxHtml);
   }
 }
