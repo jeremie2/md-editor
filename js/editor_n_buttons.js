@@ -12,11 +12,14 @@ function updatePreview() {
   const text = markdownInput.value;
   preview.innerHTML = marked.parse(text);
 
-  // Genera il menu dinamico inserendo i link ai titoli
+  // Dynamic menu of titles.
   generateTableOfContents(preview);
   
   // Check Ubuntu version.
   parseUbuntuVersions(preview);
+
+  // Link to forum discussion.
+  parseForumTag(preview);
 
   // Prism syntax highlight
   if (typeof Prism !== 'undefined') {
@@ -237,6 +240,10 @@ document.getElementById('btn-ubu-version').addEventListener('click', () => {
   const template = '\n[UBU ]\n';
   easyInsert(template);
 });
+document.getElementById('btn-link-forum').addEventListener('click', () => {
+  const template = '\n[FORUM https://forum.ubuntu-it.org/viewtopic.php?t=641900]\n';
+  easyInsert(template);
+});
 document.getElementById('btn-menu-1').addEventListener('click', () => {
   const template = '[IND]\n';
   easyInsert(template);
@@ -313,6 +320,9 @@ function changeView(viewClass, activeButton) {
         markdownInput.blur();
     } else {
         markdownInput.focus();
+        markdownInput.setSelectionRange(0, 0);
+        markdownInput.scrollTop = 0;
+        window.scrollTo(0, 0);
     }
 }
 
