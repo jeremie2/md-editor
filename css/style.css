@@ -190,7 +190,7 @@ button.active {
 .toc-h3 { margin-left: 40px; }
 
 .toc-container[open] ol {
-  animation: fadeIn 0.2s ease-out;
+    animation: fadeIn 0.2s ease-out;
 }
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-5px); }
@@ -198,7 +198,7 @@ button.active {
 }
 .toc-container {
     width: max-content;
-    min-width: 320px;
+    min-width: 400px;
     background-color: #1d1e29;
     border-radius: 10px;
     padding: 20px;
@@ -223,55 +223,36 @@ button.active {
 /* ################################### */
 
 .ubuntu-alert {
-  color: #e1e1e1;
-  padding: 12px 16px;
-  border-radius: 4px;
-  margin: 16px 0;
-  font-size: 0.95em;
-  line-height: 1.5;
+    color: #e1e1e1;
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 0.95em;
+    line-height: 1.5;
 }
-
 /* Ubu stansard support */
 .alert-active, .link-forum-box {
-    /*width: max-content;*/
-    max-width: 320px;
-    background-color: #1d1e29;
-    border-radius: 5px;
-    padding: 4px;
-    margin-top: 10px;
-    box-shadow: 0 1px 8px #000;
-    font-size: 16px;
-}
-.alert-active {
     text-align: center;
+    max-width: 400px;
+    background-color: #1d1e29;
+    padding: 4px;
+    font-size: 16px;
 }
 /* Ubu Pro support */
 .alert-pro {
-  background-color: #5f4311;
+    background-color: #954718;
 }
 /* Older/obsolete Ubu version */
 .alert-obsolete {
-  background-color: #561a1a;
-}
-/* "Help to improve the page" link */
-.btn-contrib {
-  font-weight: bold;
-  text-decoration: underline;
-  color: inherit;
+    background-color: #561a1a;
 }
 .alert-error {
-  background-color: #561a1a;
+    background-color: #561a1a;
 }
-
-/* ################################### */
-/* ########### RESPONSIVE ############ */
-/* ################################### */
-
-@media screen and (max-width: 700px) {
-
-    .alert-active {
-        position: static;
-    }
+.alert-error, .alert-pro, .alert-obsolete {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 1px 8px #1f1f1f;
 }
 
 /* ################################### */
@@ -328,22 +309,32 @@ button.active {
     blockquote p {
         color: #333;
     }
-    .toc-container, .alert-active, .link-forum-box {
-        background-color: #fcfcfc;
+    .toc-container {
         box-shadow: 0 1px 8px #cdcdcd;
     }
-    .toc-container a, .alert-active{
+    .toc-container, .alert-active, .link-forum-box {
+        background-color: #fcfcfc;
+    }
+    .toc-container a {
         color: #2e2e2e;
     }
-    .ubuntu-alert .alert-active {
-        color: #000;
+    .alert-active {
+        color: #333;
     }
-    /* Ubu Pro support */
     .alert-pro {
-      background-color: #e97631;
+        color: #fff;
+        background-color: #e97631;
+        box-shadow: 0 1px 8px #cdcdcd;
     }
-    /* Older/obsolete Ubu version */
     .alert-obsolete {
-      background-color: #9e1313;
+        background-color: #9b0909;
+        box-shadow: 0 1px 8px #cdcdcd;
+    }
+    .alert-obsolete a, .alert-pro a {
+        color: #fff;
+    }
+    .alert-error {
+        background-color: #9b0909;
+        box-shadow: 0 1px 8px #cdcdcd;
     }
 }
