@@ -1,4 +1,3 @@
-
 // ::::::::::::::::::::::::::::::::::::::
 // ::::::::::::::::::::::: CUSTOM TAGS ::
 // ::::::::::::::::::::::::::::::::::::::
@@ -152,7 +151,7 @@ const ALERT_TEMPLATES = {
     
     pro: (versionsString) => `
         <div class="ubuntu-alert alert-pro">
-            ⚠️ <strong>Guida non verificata da molto tempo.</strong> Può contenere informazioni utili per la versione Ubuntu Pro ${versionsString}. Vuoi contribuire ad aggiornarla?${CONTRIB_LINK}
+            ⚠️ <strong>Guida non verificata da molto tempo.</strong> Può contenere informazioni utili per versioni Ubuntu Pro: ${versionsString}. Vuoi contribuire ad aggiornarla?${CONTRIB_LINK}
         </div>`,
     
     obsolete: () => `
@@ -180,9 +179,8 @@ function generaSetVersioniUbuntu() {
     // From last year element in `releases` it gets the year:
     // '25.10' -> 25 as int
     const lastElementYear = parseInt(releases.at(-1).split('.')[0], 10);
-    // 3. Generiamo i rilasci standard dal 2016 (anno 16) in poi
-    for (let year = lastElementYear; year + 1 <= lastTwoCorrectDigits; year++) {
-        
+for ( let year = lastElementYear + 1; year <= lastTwoCorrectDigits; year++) {
+
         // `.04` always released in the first half of the year.
         if (year < lastTwoCorrectDigits || (year === lastTwoCorrectDigits && new Date().getMonth() >= 3)) {
             releases.push(`${year}.04`);
@@ -216,12 +214,19 @@ function validateVersions(versionsArray, validVersionsSet) {
     };
 }
 
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 function getHighestSupportStatus(versionsArray) {
+    // 
     const now = new Date();
     const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth() + 1; // Gennaio è 0 -> +1
+    const currentMonth = now.getMonth() + 1; // January is 0 -> +1
     const currentTotalMonths = (currentYear * 12) + currentMonth;
 
+    // For LTS versions:
+    // maxStatus = 2 -> standard 5 years support range.
+    // maxStatus = 1 -> pro 10 years support range.
+    // maxStatus = 0 -> obsolete. (Legacy Support is out of our goals)
     let maxStatus = 0;
 
     versionsArray.forEach(ver => {
@@ -229,19 +234,29 @@ function getHighestSupportStatus(versionsArray) {
         const parts = ver.split('.');
         if (parts.length !== 2) return;
 
+        // Before reaching the year 2100 remember to modify this part! ;)
         const releaseYear = parseInt("20" + parts[0], 10);
         const releaseMonth = parseInt(parts[1], 10);
 
-        // Controllo se è LTS (Aprile degli anni pari)
+        // LTS versions on April in even-numbered years.
         const isLTS = (releaseMonth === 4 && releaseYear % 2 === 0);
-
-        const releaseTotalMonths = (releaseYear * 12) + releaseMonth;
+        // LTS standard support: 5 years -> 60 months.
+        // LTS Pro support: 10 years -> 120 months.
+        // If NOT LTS it gets support for 9 months.
         const standardSupportDuration = isLTS ? (5 * 12) : 9;
         const proSupportDuration = isLTS ? (10 * 12) : 9;
 
+        // Sort of age-score in months for a release.
+        // E.g. 24.04  -> (2024 * 12) + 4 = 24.292 months
+        const releaseTotalMonths = (releaseYear * 12) + releaseMonth;
+        // 24.04 end of standars support after 24.292 + 60 = 24.352 months
         const endStandardMonths = releaseTotalMonths + standardSupportDuration;
+        // 24.04 end of pro support after 24.292 + 120 = 24.412 months
         const endProMonths = releaseTotalMonths + proSupportDuration;
 
+        // If months <= endStandardMonths → maxStatus = 2 (Active Standard Support).
+        // Se lo standard è scaduto, ma siamo ancora dentro la scadenza Pro → Voto 1 (Solo Ubuntu Pro).
+        // Altrimenti → Rimane Voto 0 (Obsoleto).
         if (currentTotalMonths <= endStandardMonths) {
             if (maxStatus < 2) maxStatus = 2;
         } else if (isLTS && currentTotalMonths <= endProMonths) {
@@ -275,15 +290,12 @@ function parseUbuntuVersions(previewArea) {
   // It makes UBU tag usable inside raw text tags.
   if (isTagInsideCode(fullTag, previewArea)) return;
 
-  // Ubu versions array which needs to be checked.
-  const versions = versionsString.trim().split(/\s+/);
-  
-  // :::::::::::::::::::::::: ok till here
-  
-  // 2. Generazione del Set ufficiale di controllo
+  // Separating each version and generating an array.
+  const rawVersions = versionsString.trim().split(/\s+/);
+  // No duplicates creating a set.
+  const versions = [...new Set(rawVersions)];
+
   const validUbuntuVersions = generaSetVersioniUbuntu();
-  
-  // 3. PROCESSO DI VALIDAZIONE
   const validation = validateVersions(versions, validUbuntuVersions);
   
   let alertBoxHtml = '';
