@@ -80,7 +80,7 @@ pre, code {
     background-color: #1d1e29;
 }
 pre {
-    /*! border: 1px solid #d05d19; */
+    overflow: scroll;
     margin: .5em 0;
     padding: 0.7em;
     border-radius: 10px;
@@ -198,6 +198,7 @@ button.active {
 }
 .toc-container {
     width: max-content;
+    min-width: 320px;
     background-color: #1d1e29;
     border-radius: 10px;
     padding: 20px;
@@ -231,19 +232,18 @@ button.active {
 }
 
 /* Ubu stansard support */
-.alert-active {
-    /*margin-left: auto;*/
-    text-align: center;
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    width: max-content;
+.alert-active, .link-forum-box {
+    /*width: max-content;*/
+    max-width: 320px;
     background-color: #1d1e29;
-    border-radius: 10px;
-    padding: 20px;
+    border-radius: 5px;
+    padding: 4px;
     margin-top: 10px;
     box-shadow: 0 1px 8px #000;
     font-size: 16px;
+}
+.alert-active {
+    text-align: center;
 }
 /* Ubu Pro support */
 .alert-pro {
@@ -328,7 +328,7 @@ button.active {
     blockquote p {
         color: #333;
     }
-    .toc-container, .alert-active {
+    .toc-container, .alert-active, .link-forum-box {
         background-color: #fcfcfc;
         box-shadow: 0 1px 8px #cdcdcd;
     }
@@ -345,17 +345,5 @@ button.active {
     /* Older/obsolete Ubu version */
     .alert-obsolete {
       background-color: #9e1313;
-    }
-    /* "Help to improve the page" link */
-    .btn-contrib {
-      font-weight: bold;
-      text-decoration: underline;
-      color: inherit;
-    }
-    .alert-error {
-      background-color: #9e1313;
-    }
-    .ubuntu-alert .btn-contrib, .alert-pro, .alert-obsolete {
-        color: #fff;
     }
 }
