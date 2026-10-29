@@ -328,8 +328,8 @@ function parseUbuntuVersions(previewArea) {
       } else if (maxStatus === 1) {
           // Only pro version will be shown.
           const proVersions = versions
-            .filter(ver => detailedStatuses[ver] === 1)
-            .sort();
+             .filter(ver => detailedStatuses[ver] === 1)
+             .sort();
           alertBoxHtml = ALERT_TEMPLATES.pro(proVersions.join(', '));
       } else {
           alertBoxHtml = ALERT_TEMPLATES.obsolete();
