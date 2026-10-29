@@ -276,10 +276,10 @@ function parseUbuntuVersions(previewArea) {
   const versionRegex = /\[UBU\s+([^\]]+)\]/gi;
 
   // `exec()` searches the given pattern (versionRegex)
-  // into `currentHtml`. It returns `null` id it doesn't find it.
+  // into `currentHtml`. It returns `null` if it doesn't find it.
   // Otherwise it returns an array where:
   // match[0]: the whole tag like [UBU 24.04 24.10].
-  // match[0]: text inside [UBU ] like "24.04 24.10".
+  // match[1]: text inside [UBU ] like "24.04 24.10".
   const match = versionRegex.exec(currentHtml);
   
   if (!match) return; // Exit if there is NO tag.
@@ -287,7 +287,7 @@ function parseUbuntuVersions(previewArea) {
   const fullTag = match[0];        // E.g. "[UBU 24.04 26.10]"
   const versionsString = match[1]; // E.g. "24.04 26.10"
   
-  // It makes UBU tag usable inside raw text tags.
+  // It makes UBU tag not active inside raw text tags (<code>, <pre>).
   if (isTagInsideCode(fullTag, previewArea)) return;
 
   // Separating each version and generating an array.
@@ -301,13 +301,13 @@ function parseUbuntuVersions(previewArea) {
   let alertBoxHtml = '';
 
   if (!validation.isValid) {
-      // Se non è valida, usa il template di errore
+      // If not valid -> error template.
       alertBoxHtml = ALERT_TEMPLATES.error(validation.invalidVersion);
   } else {
-      // 4. DEDUZIONE DEL SUPPORTO STANDARD / PRO
+      // Which kind of support (standard/pro).
       const maxStatus = getHighestSupportStatus(versions);
       
-      // 5. SELEZIONE DEL TEMPLATE IN BASE ALLO STATO
+      // Which kind of template based on kind of support.
       if (maxStatus === 2) {
           alertBoxHtml = ALERT_TEMPLATES.active(versions.join(', '));
       } else if (maxStatus === 1) {
@@ -316,8 +316,7 @@ function parseUbuntuVersions(previewArea) {
           alertBoxHtml = ALERT_TEMPLATES.obsolete();
       }
   }
-  
-  // 6. Iniezione finale nel DOM
+
   const freshHtml = previewArea.innerHTML;
   if (freshHtml.includes(`<p>${fullTag}</p>`)) {
       previewArea.innerHTML = freshHtml.replace(`<p>${fullTag}</p>`, alertBoxHtml);
