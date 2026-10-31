@@ -74,10 +74,69 @@ function isTagInsideCode(tagText, container) {
 // :::::::::::::::::::::: TOC :::::::::::
 // ::::::::::::::::::::::::::::::::::::::
 
+// :::::::::::::::::::::: HELPER FUNCTION to build ordered lists
+
+function generateTocOl(headings) {
+  let tocHtml = '<ol>';
+  let currentLevel = 1;
+
+  headings.forEach((heading, index) => {
+    const uniqueId = 'heading-paragraph-' + index;
+    heading.id = uniqueId;
+
+    // Extracts the level from the tag, e.g. "h2" -> 2.
+    const level = parseInt(heading.tagName.substring(1));
+
+    // Scende di livello: h1 -> h2 -> h3
+    if (level > currentLevel) {
+      while (level > currentLevel) {
+        tocHtml += '<ol>';
+        currentLevel++;
+      }
+    }
+    // Moves up a level: h3 -> h2 -> h1.
+    else if (level < currentLevel) {
+      while (level < currentLevel) {
+        tocHtml += '</ol></li>';
+        currentLevel--;
+      }
+    }
+    // On the same level as the previous title.
+    else if (index > 0) {
+      tocHtml += '</li>';
+    }
+
+    tocHtml += `<li><a href="#${uniqueId}">${heading.innerText}</a>`;
+  });
+
+  // Closes all open lists.
+  while (currentLevel > 0) {
+    tocHtml += '</ol>';
+
+    if (currentLevel > 1) {
+      tocHtml += '</li>';
+    }
+
+    currentLevel--;
+  }
+
+  return tocHtml;
+}
+
+// :::::::::::::::::::::: MAIN FUNCTION toc
+
 function generateTableOfContents(previewArea) {
   const currentHtml = previewArea.innerHTML;
   let foundPlaceholder = "";
   let maxLevel = 3;
+
+  const sidebarToc = document.getElementById('sidebar-toc');
+
+  // Removes any remnants of the previous index.
+  if (sidebarToc) {
+    sidebarToc.innerHTML = "";
+    sidebarToc.classList.remove('has-toc');
+  }
 
   if (currentHtml.includes('[IND-3]')) {
     foundPlaceholder = '[IND-3]';
@@ -89,80 +148,63 @@ function generateTableOfContents(previewArea) {
     foundPlaceholder = '[IND]';
     maxLevel = 1;
   }
-  
+
   if (!foundPlaceholder) return;
 
-  // If IND tag is found inside raw text tags, function stops.
-  if (isTagInsideCode(foundPlaceholder, previewArea)) return; 
+  if (isTagInsideCode(foundPlaceholder, previewArea)) return;
 
-  let selectors = [];
+  const selectors = [];
+
   for (let i = 1; i <= maxLevel; i++) {
     selectors.push('h' + i);
   }
-  const selectorsString = selectors.join(', ');
 
-  const headings = previewArea.querySelectorAll(selectorsString);
+  const headings = previewArea.querySelectorAll(selectors.join(', '));
+
   if (headings.length === 0) return;
 
-  // Html tree initialization with <ol> tag.
-  let tocHtml = '<details class="toc-container"><summary style="cursor:pointer; user-select:none;"><strong>Indice</strong></summary><ol>';
-  let currentLevel = 1;
+  const tocOl = generateTocOl(headings);
 
-  headings.forEach((heading, index) => {
-    const uniqueId = 'heading-paragraph-' + index;
-    heading.id = uniqueId;
-
-    // Extract number from tag (e.g. "h2" -> 2)
-    const level = parseInt(heading.tagName.substring(1));
-
-    // If we get down a level (e.g. h1 -> h2)
-    // let's start a new ordered sub-list.
-    if (level > currentLevel) {
-      while (level > currentLevel) {
-        tocHtml += '<ol>';
-        currentLevel++;
-      }
-    } 
-    // If we go up a level (e.g. h2 -> h1),
-    // we close the open sub-lists.
-    else if (level < currentLevel) {
-      while (level < currentLevel) {
-        tocHtml += '</ol></li>';
-        currentLevel--;
-      }
-    } 
-    // If we are at the same level of the
-    // previous tag, we close the previous tag.
-    else if (index > 0) {
-      tocHtml += '</li>';
-    }
-
-    // Add the single voice of the list.
-    tocHtml += `<li><a href="#${uniqueId}">${heading.innerText}</a>`;
-  });
-
-  // Let's close every the list at the end of the loop.
-  while (currentLevel > 0) {
-    tocHtml += '</ol>';
-    if (currentLevel > 1) tocHtml += '</li>';
-    currentLevel--;
-  }
-  
-  tocHtml += '</details>';
+  const detailsTocHtml = `
+    <details class="toc-container mobile-only-toc">
+      <summary style="cursor:pointer; user-select:none;">
+        <strong>Indice</strong>
+      </summary>
+      ${tocOl}
+    </details>
+  `;
 
   const freshHtml = previewArea.innerHTML;
 
   if (freshHtml.includes(`<p>${foundPlaceholder}</p>`)) {
-    previewArea.innerHTML = freshHtml.replace(`<p>${foundPlaceholder}</p>`, tocHtml);
+    previewArea.innerHTML = freshHtml.replace(
+      `<p>${foundPlaceholder}</p>`,
+      detailsTocHtml
+    );
   } else {
-    previewArea.innerHTML = freshHtml.replace(foundPlaceholder, tocHtml);
+    previewArea.innerHTML = freshHtml.replace(
+      foundPlaceholder,
+      detailsTocHtml
+    );
+  }
+
+  // Sidebar is populated and made visible only if an index exists.
+  if (sidebarToc) {
+    sidebarToc.innerHTML = `
+      <div class="desktop-only-toc">
+        ${tocOl}
+      </div>
+    `;
+
+    sidebarToc.classList.add('has-toc');
   }
 
   const detailsEl = previewArea.querySelector('.toc-container');
+
   if (detailsEl) {
     detailsEl.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => {
-        detailsEl.open = false; // Close the index after click.
+        detailsEl.open = false;
       });
     });
   }
