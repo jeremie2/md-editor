@@ -237,16 +237,24 @@ button.active {
     width: 100%;
     background-color: transparent;
     box-shadow: none;
-    border-right: 1px solid #d05d19;
+    /*border-right: 1px solid #d05d19;*/
     border-radius: 0;
     padding: 0 10px 0 0;
     margin: 0;
 }
-
+#sidebar-toc {
+    width: max-content;
+    min-width: 400px;
+    background-color: #1d1e29;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 8px #000;
+    font-size: 16px;
+}
 #sidebar-toc ol {
     margin-top: 0;
 }
-
 #sidebar-toc a {
     font-size: 16px;
     text-decoration-thickness: 1px;
@@ -352,7 +360,6 @@ button.active {
         width: 100%;
         background-color: transparent;
         box-shadow: none;
-        border-right: 1px solid #d05d19;
         border-radius: 0;
         padding: 0 10px 0 0;
         margin: 0;
@@ -413,10 +420,10 @@ button.active {
     blockquote p {
         color: #333;
     }
-    .toc-container {
+    .toc-container, #sidebar-toc {
         box-shadow: 0 1px 8px #cdcdcd;
     }
-    .toc-container, .alert-active, .link-forum-box {
+    .toc-container, .alert-active, .link-forum-box, #sidebar-toc {
         background-color: #fcfcfc;
     }
     .toc-container a {
