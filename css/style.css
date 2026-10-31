@@ -32,6 +32,48 @@ body {
     position: relative;
 }
 
+/* ############ SIDEBAR ############ */
+
+.preview-column-wrapper {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#sidebar-toc {
+    display: none;
+}
+
+.mobile-only-toc {
+    display: block;
+}
+
+.editor-container.split-view #markdown-input,
+.editor-container.split-view .preview-column-wrapper {
+    display: block;
+    flex: 1 !important;
+    width: 50% !important;
+}
+/* --- COMPORTAMENTO IN SOLO EDITOR --- */
+.editor-container.only-input .preview-column-wrapper {
+    display: none !important; /* Nasconde l'intero blocco di destra (anteprima + sidebar) */
+}
+.editor-container.only-input #markdown-input {
+    display: block;
+    flex: 1 !important;
+    width: 100% !important; /* L'input si prende tutto lo schermo */
+}
+
+/* --- COMPORTAMENTO IN SOLO ANTEPRIMA --- */
+.editor-container.only-preview #markdown-input {
+    display: none !important; /* Nasconde la textarea */
+}
+.editor-container.only-preview .preview-column-wrapper {
+    display: flex; /* Mantiene il flusso flessibile per la sidebar dell'indice */
+    flex: 1 !important;
+    width: 100% !important; /* L'anteprima si prende tutto lo schermo */
+}
 /* ################################### */
 /* ############## BEGIN ############## */
 /* ################################### */
@@ -60,6 +102,7 @@ a {
     gap: 15px;
     height: 800px;
 }
+
 #markdown-input, #preview {
     flex: 1;
     background-color: #303038;
@@ -253,6 +296,42 @@ button.active {
     margin-bottom: 10px;
     border-radius: 5px;
     box-shadow: 0 1px 8px #1f1f1f;
+}
+
+/* ################################### */
+/* ########### RESPONSIVE ############ */
+/* ################################### */
+
+@media screen and (min-width: 1024px) {
+    .preview-column-wrapper {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    #sidebar-toc {
+        display: block;
+        flex: 0 0 260px;
+        width: 260px;
+        position: sticky;
+        top: 0;
+        max-height: 100%;
+        overflow-y: auto;
+    }
+
+    .mobile-only-toc {
+        display: none !important;
+    }
+
+    #sidebar-toc .desktop-only-toc {
+        width: 100%;
+        background-color: transparent;
+        box-shadow: none;
+        border-right: 1px solid #d05d19;
+        border-radius: 0;
+        padding: 0 10px 0 0;
+        margin: 0;
+    }
 }
 
 /* ################################### */
