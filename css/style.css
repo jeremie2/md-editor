@@ -32,6 +32,64 @@ body {
     position: relative;
 }
 
+/* ############ SIDEBAR ############ */
+
+.preview-column-wrapper {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+#sidebar-toc {
+    display: none;
+}
+.mobile-only-toc {
+    display: block;
+}
+/* SPLIT VIEW: always use <details>, at any width. */
+.editor-container.split-view .toc-container.mobile-only-toc {
+    display: block !important;
+}
+.editor-container.split-view #sidebar-toc {
+    display: none !important;
+}
+/* ONLY EDITOR: no side index */
+.editor-container.only-input #sidebar-toc {
+    display: none !important;
+}
+.editor-container.split-view #markdown-input,
+.editor-container.split-view .preview-column-wrapper {
+    display: block;
+    flex: 1 !important;
+    width: 50% !important;
+}
+/* --- BEHAVIOR IN EDITOR ONLY --- */
+.editor-container.only-input .preview-column-wrapper {
+    display: none !important; /* Nasconde l'intero blocco di destra (anteprima + sidebar) */
+}
+.editor-container.only-input #markdown-input {
+    display: block;
+    flex: 1 !important;
+    width: 100% !important; /* Input gets the whole screen. */
+}
+
+/* --- BEHAVIOR IN PREVIEW ONLY --- */
+.editor-container.only-preview #markdown-input {
+    display: none !important; /* Nasconde la textarea */
+}
+.editor-container.only-preview .preview-column-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 15px;
+    flex: 1 !important;
+    width: 100% !important;
+}
+.editor-container.only-preview #preview {
+    flex: 1;
+    min-width: 0;
+}
+
 /* ################################### */
 /* ############## BEGIN ############## */
 /* ################################### */
@@ -60,6 +118,7 @@ a {
     gap: 15px;
     height: 800px;
 }
+
 #markdown-input, #preview {
     flex: 1;
     background-color: #303038;
@@ -180,14 +239,36 @@ button.active {
     display: block;
     flex: 1;
 }
+#sidebar-toc .desktop-only-toc {
+    width: 100%;
+    background-color: transparent;
+    box-shadow: none;
+    /*border-right: 1px solid #d05d19;*/
+    border-radius: 0;
+    padding: 0 10px 0 0;
+    margin: 0;
+}
+#sidebar-toc {
+    width: 320px;
+    min-width: 0;
+    background-color: #1d1e29;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 8px #000;
+    font-size: 16px;
+}
+#sidebar-toc ol {
+    margin-top: 0;
+}
+#sidebar-toc a {
+    font-size: 16px;
+    text-decoration-thickness: 1px;
+}
 
 /* ################################### */
 /* ############### TOC ############### */
 /* ################################### */
-
-.toc-h1 { margin-left: 0px; list-style-type: none; }
-.toc-h2 { margin-left: 20px; }
-.toc-h3 { margin-left: 40px; }
 
 .toc-container[open] ol {
     animation: fadeIn 0.2s ease-out;
@@ -199,6 +280,7 @@ button.active {
 .toc-container {
     width: max-content;
     min-width: 400px;
+    max-width: 400px;
     background-color: #1d1e29;
     border-radius: 10px;
     padding: 20px;
@@ -256,6 +338,37 @@ button.active {
 }
 
 /* ################################### */
+/* ########### RESPONSIVE ############ */
+/* ################################### */
+
+/* PREVIEW ONLY + wide screen + generated index:
+   use the sidebar end hide <details>, */
+@media screen and (min-width: 1024px) {
+    .editor-container.only-preview #sidebar-toc.has-toc {
+        display: block;
+        flex: 0 0 320px;
+        width: 320px;
+        position: sticky;
+        top: 0;
+        max-height: 100%;
+        overflow-y: auto;
+    }
+    .editor-container.only-preview .toc-container.mobile-only-toc {
+        display: none !important;
+    }
+}
+/* PREVIEW ONLY + narrow screen:
+   use <details> again. */
+@media screen and (max-width: 1023.98px) {
+    .editor-container.only-preview .toc-container.mobile-only-toc {
+        display: block !important;
+    }
+    .editor-container.only-preview #sidebar-toc {
+        display: none !important;
+    }
+}
+
+/* ################################### */
 /* ########### LIGHT MODE ############ */
 /* ################################### */
 
@@ -309,10 +422,10 @@ button.active {
     blockquote p {
         color: #333;
     }
-    .toc-container {
+    .toc-container, #sidebar-toc {
         box-shadow: 0 1px 8px #cdcdcd;
     }
-    .toc-container, .alert-active, .link-forum-box {
+    .toc-container, .alert-active, .link-forum-box, #sidebar-toc {
         background-color: #fcfcfc;
     }
     .toc-container a {
