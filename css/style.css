@@ -55,7 +55,7 @@ body {
     flex: 1 !important;
     width: 50% !important;
 }
-/* --- COMPORTAMENTO IN SOLO EDITOR --- */
+/* --- BEHAVIOR IN EDITOR ONLY --- */
 .editor-container.only-input .preview-column-wrapper {
     display: none !important; /* Nasconde l'intero blocco di destra (anteprima + sidebar) */
 }
@@ -65,7 +65,7 @@ body {
     width: 100% !important; /* L'input si prende tutto lo schermo */
 }
 
-/* --- COMPORTAMENTO IN SOLO ANTEPRIMA --- */
+/* --- BEHAVIOR IN PREVIEW ONLY --- */
 .editor-container.only-preview #markdown-input {
     display: none !important; /* Nasconde la textarea */
 }
@@ -74,6 +74,13 @@ body {
     flex: 1 !important;
     width: 100% !important; /* L'anteprima si prende tutto lo schermo */
 }
+
+/* :::::::::::::::::: test ::::::::::::::::::::: */
+.editor-container.only-preview #preview {
+    flex: 1;
+    min-width: 0;
+}
+
 /* ################################### */
 /* ############## BEGIN ############## */
 /* ################################### */
@@ -224,13 +231,30 @@ button.active {
     flex: 1;
 }
 
+/* :::::::::::::::::::::::::::::::::::::::::::  */
+
+#sidebar-toc .desktop-only-toc {
+    width: 100%;
+    background-color: transparent;
+    box-shadow: none;
+    border-right: 1px solid #d05d19;
+    border-radius: 0;
+    padding: 0 10px 0 0;
+    margin: 0;
+}
+
+#sidebar-toc ol {
+    margin-top: 0;
+}
+
+#sidebar-toc a {
+    font-size: 16px;
+    text-decoration-thickness: 1px;
+}
+
 /* ################################### */
 /* ############### TOC ############### */
 /* ################################### */
-
-.toc-h1 { margin-left: 0px; list-style-type: none; }
-.toc-h2 { margin-left: 20px; }
-.toc-h3 { margin-left: 40px; }
 
 .toc-container[open] ol {
     animation: fadeIn 0.2s ease-out;
@@ -309,7 +333,8 @@ button.active {
         gap: 15px;
     }
 
-    #sidebar-toc {
+    /* Sidebar solo nella vista "Solo anteprima" */
+    .editor-container.only-preview #sidebar-toc.has-toc {
         display: block;
         flex: 0 0 260px;
         width: 260px;
