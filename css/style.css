@@ -40,15 +40,23 @@ body {
     display: flex;
     flex-direction: column;
 }
-
 #sidebar-toc {
     display: none;
 }
-
 .mobile-only-toc {
     display: block;
 }
-
+/* SPLIT VIEW: always use <details>, at any width. */
+.editor-container.split-view .toc-container.mobile-only-toc {
+    display: block !important;
+}
+.editor-container.split-view #sidebar-toc {
+    display: none !important;
+}
+/* ONLY EDITOR: no side index */
+.editor-container.only-input #sidebar-toc {
+    display: none !important;
+}
 .editor-container.split-view #markdown-input,
 .editor-container.split-view .preview-column-wrapper {
     display: block;
@@ -62,7 +70,7 @@ body {
 .editor-container.only-input #markdown-input {
     display: block;
     flex: 1 !important;
-    width: 100% !important; /* L'input si prende tutto lo schermo */
+    width: 100% !important; /* Input gets the whole screen. */
 }
 
 /* --- BEHAVIOR IN PREVIEW ONLY --- */
@@ -70,12 +78,13 @@ body {
     display: none !important; /* Nasconde la textarea */
 }
 .editor-container.only-preview .preview-column-wrapper {
-    display: flex; /* Mantiene il flusso flessibile per la sidebar dell'indice */
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 15px;
     flex: 1 !important;
-    width: 100% !important; /* L'anteprima si prende tutto lo schermo */
+    width: 100% !important;
 }
-
-/* :::::::::::::::::: test ::::::::::::::::::::: */
 .editor-container.only-preview #preview {
     flex: 1;
     min-width: 0;
@@ -230,9 +239,6 @@ button.active {
     display: block;
     flex: 1;
 }
-
-/* :::::::::::::::::::::::::::::::::::::::::::  */
-
 #sidebar-toc .desktop-only-toc {
     width: 100%;
     background-color: transparent;
@@ -243,8 +249,8 @@ button.active {
     margin: 0;
 }
 #sidebar-toc {
-    width: max-content;
-    min-width: 400px;
+    width: 320px;
+    min-width: 0;
     background-color: #1d1e29;
     border-radius: 10px;
     padding: 20px;
@@ -274,6 +280,7 @@ button.active {
 .toc-container {
     width: max-content;
     min-width: 400px;
+    max-width: 400px;
     background-color: #1d1e29;
     border-radius: 10px;
     padding: 20px;
@@ -334,35 +341,30 @@ button.active {
 /* ########### RESPONSIVE ############ */
 /* ################################### */
 
+/* PREVIEW ONLY + wide screen + generated index:
+   use the sidebar end hide <details>, */
 @media screen and (min-width: 1024px) {
-    .preview-column-wrapper {
-        flex-direction: row;
-        align-items: flex-start;
-        gap: 15px;
-    }
-
-    /* Sidebar solo nella vista "Solo anteprima" */
     .editor-container.only-preview #sidebar-toc.has-toc {
         display: block;
-        flex: 0 0 260px;
-        width: 260px;
+        flex: 0 0 320px;
+        width: 320px;
         position: sticky;
         top: 0;
         max-height: 100%;
         overflow-y: auto;
     }
-
-    .mobile-only-toc {
+    .editor-container.only-preview .toc-container.mobile-only-toc {
         display: none !important;
     }
-
-    #sidebar-toc .desktop-only-toc {
-        width: 100%;
-        background-color: transparent;
-        box-shadow: none;
-        border-radius: 0;
-        padding: 0 10px 0 0;
-        margin: 0;
+}
+/* PREVIEW ONLY + narrow screen:
+   use <details> again. */
+@media screen and (max-width: 1023.98px) {
+    .editor-container.only-preview .toc-container.mobile-only-toc {
+        display: block !important;
+    }
+    .editor-container.only-preview #sidebar-toc {
+        display: none !important;
     }
 }
 
